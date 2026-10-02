@@ -1,21 +1,10 @@
-# AI阅读助手依赖包列表
+# mashang-fetch 核心依赖（Fetch / Preview）
 
-# Web界面
+# Web 界面
 gradio>=4.0.0
 
-# AI模型和自然语言处理
-langchain>=0.0.267
-langchain-openai>=0.0.2
-openai>=1.0.0
+# HTTP 请求
+requests>=2.31.0
 
 # 环境变量管理
 python-dotenv>=1.0.0
-
-# HTTP请求
-requests>=2.31.0
-
-# 文件和路径处理
-pathlib>=1.0.1
-
-# 日期和时间处理
-python-dateutil>=2.8.2

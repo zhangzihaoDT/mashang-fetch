@@ -1,14 +1,14 @@
 {
-  "name": "aireadingassistant",
+  "name": "mashang-fetch",
   "version": "1.0.0",
   "main": "index.js",
+  "description": "Link → File → Preview：把外部资源链接转换为本地结构化文件",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "fetch": "node src/cli.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "axios": "^1.9.0",
     "cheerio": "^1.0.0",

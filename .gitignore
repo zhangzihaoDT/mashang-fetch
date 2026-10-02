@@ -42,5 +42,6 @@ Thumbs.db
 *.swp
 *.swo
 
-# 项目特定文件
-output/*.txt
+# 项目特定文件：生成的转换结果统一放在 output/，整个输出目录不纳入版本管理
+output/*
+!output/.gitkeep
