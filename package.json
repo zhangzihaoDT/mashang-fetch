@@ -4,7 +4,12 @@
   "main": "index.js",
   "description": "Link → File → Preview：把外部资源链接转换为本地结构化文件",
   "scripts": {
-    "fetch": "node src/cli.js"
+    "fetch": "node src/cli.js",
+    "up": "./scripts/dev.sh start",
+    "down": "./scripts/dev.sh stop",
+    "build": "npm --prefix web run build",
+    "web:dev": "npm --prefix web run dev",
+    "test": "./scripts/test.sh"
   },
   "keywords": [],
   "author": "",

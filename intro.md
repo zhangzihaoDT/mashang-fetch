@@ -21,10 +21,6 @@ mashang-fetch 的核心是 **Fetch / Convert**：把外部资源尽可能转换�
 
 Preview 的第一职责是忠实呈现转换结果，不经过任何模型。
 
-外围能力（默认不触发）：
-- AI Summary / AI Q&A（可选，需配置 ARK_API_KEY）
-- Save to notes / Flomo（可选）
-
 ## Pipeline 说明
 
 1. Resolver：规范化 URL，按域名分类策略（`mp.weixin.qq.com` 走 Axios，其余走 Puppeteer），短链解析留作扩展点。

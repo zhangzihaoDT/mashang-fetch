@@ -45,3 +45,9 @@ Thumbs.db
 # 项目特定文件：生成的转换结果统一放在 output/，整个输出目录不纳入版本管理
 output/*
 !output/.gitkeep
+
+# 运行时文件（PID / 日志）
+.local/
+
+# 前端构建产物
+web/dist/

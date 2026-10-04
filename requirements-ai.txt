@@ -1,7 +1,0 @@
-# 可选 AI 能力依赖（Summary / Q&A）
-# 安装: pip install -r requirements-ai.txt
--r requirements.txt
-
-langchain>=0.0.267
-langchain-openai>=0.0.2
-openai>=1.0.0

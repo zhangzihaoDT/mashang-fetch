@@ -1,10 +1,5 @@
 # mashang-fetch 核心依赖（Fetch / Preview）
 
-# Web 界面
-gradio>=4.0.0
-
-# HTTP 请求
-requests>=2.31.0
-
-# 环境变量管理
-python-dotenv>=1.0.0
+# Web 服务（API + 托管前端）
+fastapi>=0.110.0
+uvicorn>=0.27.0
