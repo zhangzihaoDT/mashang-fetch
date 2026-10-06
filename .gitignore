@@ -1,30 +1,31 @@
 # 环境变量文件
 .env
 .env.*
+!.env.example
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
+/.Python
+/env/
+/build/
+/develop-eggs/
+/dist/
+/downloads/
+/eggs/
+/.eggs/
+/lib/
+/lib64/
+/parts/
+/sdist/
+/var/
 *.egg-info/
-.installed.cfg
+/.installed.cfg
 *.egg
-venv/
-.venv/
+/venv/
+/.venv/
 
 # Node.js
 node_modules/
@@ -42,7 +43,7 @@ Thumbs.db
 *.swp
 *.swo
 
-# 项目特定文件：生成的转换结果统一放在 output/，整个输出目录不纳入版本管理
+# 新生成的转换结果放在 output/ 并忽略；已跟踪的归档文件不受此规则影响
 output/*
 !output/.gitkeep
 
