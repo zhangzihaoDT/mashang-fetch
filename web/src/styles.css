@@ -53,8 +53,11 @@ select {
   padding: 4px 2px 18px;
 }
 .app-header .mark {
-  font-size: 30px;
-  line-height: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
 }
 .app-header h1 {
   margin: 0;
@@ -654,8 +657,10 @@ select {
   color: var(--zh-muted);
 }
 .empty-icon {
-  font-size: 44px;
-  line-height: 1;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 .empty-title {
   margin-top: 14px;
