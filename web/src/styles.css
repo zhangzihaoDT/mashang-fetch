@@ -149,7 +149,7 @@ select {
 /* ── 工作区：左文件 / 右预览 ───────────────── */
 .workspace {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-columns: minmax(300px, 3fr) minmax(0, 7fr);
   gap: 20px;
   height: calc(100vh - 262px);
   min-height: 440px;
@@ -193,6 +193,148 @@ select {
 .icon-btn:hover {
   background: var(--zh-cyan);
 }
+
+/* ── 空间切换 Inbox / 资料库 ───────────────── */
+.scope-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 3px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: var(--zh-light-blue);
+}
+.scope-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--zh-blue);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+}
+.scope-tab.active {
+  background: var(--zh-card);
+  box-shadow: 0 1px 4px rgba(23, 74, 124, 0.15);
+}
+.scope-count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: rgba(23, 74, 124, 0.12);
+  color: var(--zh-blue);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+.scope-tab.active .scope-count {
+  background: var(--zh-cyan);
+  color: var(--zh-deep-blue);
+}
+.file-search {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--zh-border);
+  border-radius: 9px;
+  background: var(--zh-card);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.file-search:focus {
+  border-color: var(--zh-cyan);
+  box-shadow: 0 0 0 3px rgba(126, 205, 235, 0.25);
+}
+.files-panel .panel-head {
+  gap: 8px;
+}
+.files-panel .panel-head .mini-btn {
+  height: 34px;
+  padding: 0 12px;
+  line-height: 34px;
+}
+
+/* ── 文件工具栏（选择 / 操作） ─────────────── */
+.files-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--zh-cyan);
+  border-radius: 12px;
+  background: var(--zh-light-blue);
+}
+.toolbar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.toolbar-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--zh-blue);
+}
+.toolbar-link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--zh-blue);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.toolbar-link:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.toolbar-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--zh-muted);
+}
+.toolbar-rename {
+  display: flex;
+  gap: 6px;
+}
+.toolbar-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.toolbar-confirm .confirm-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #c0392b;
+}
+.batch-list {
+  margin: 0;
+  padding-left: 16px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 11px;
+  color: var(--zh-muted);
+}
+.batch-list li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .file-list {
   flex: 1;
   min-height: 0;
@@ -200,16 +342,61 @@ select {
   margin: 0 -4px;
   padding: 0 4px;
 }
-.file-item {
-  display: block;
+
+/* ── 文件夹分组 ───────────────────────────── */
+.folder-group {
+  margin: 2px 0;
+}
+.folder-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--zh-blue);
+  font-size: 12px;
+  font-weight: 600;
   text-align: left;
-  padding: 10px 12px;
+  cursor: pointer;
+}
+.folder-head:hover {
+  background: var(--zh-light-blue);
+}
+.folder-caret {
+  width: 12px;
+  color: var(--zh-muted);
+  font-size: 10px;
+}
+.folder-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.folder-count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--zh-light-blue);
+  color: var(--zh-muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+.folder-children {
+  margin: 2px 0 4px 10px;
+  padding-left: 6px;
+  border-left: 1px solid var(--zh-border);
+}
+.file-item {
   margin: 4px 0;
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
-  cursor: pointer;
   transition: background 0.12s ease, border-color 0.12s ease;
 }
 .file-item:hover {
@@ -218,6 +405,25 @@ select {
 .file-item.active {
   background: var(--zh-light-blue);
   border-color: var(--zh-cyan);
+}
+.file-row {
+  display: flex;
+  align-items: center;
+}
+.file-check {
+  margin: 0 0 0 10px;
+  accent-color: var(--zh-blue);
+  cursor: pointer;
+  flex: none;
+}
+.file-main {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  padding: 10px 12px 6px 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 .file-title {
   font-size: 13px;
@@ -235,6 +441,45 @@ select {
   font-size: 11px;
   color: var(--zh-muted);
 }
+.confirm-error {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #c0392b;
+  word-break: break-all;
+}
+.mini-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.mini-btn {
+  height: 26px;
+  padding: 0 9px;
+  border: none;
+  border-radius: 7px;
+  background: var(--zh-card);
+  color: var(--zh-blue);
+  font-size: 11px;
+  line-height: 26px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.mini-btn:hover {
+  background: var(--zh-cyan);
+}
+.mini-btn.primary {
+  background: var(--zh-blue);
+  color: #fff;
+}
+.mini-btn.primary:hover {
+  filter: brightness(1.08);
+}
+.mini-btn.danger {
+  color: #c0392b;
+}
+.mini-btn.danger:hover {
+  background: #f9dedb;
+}
 
 /* ── Preview ──────────────────────────────── */
 .preview-panel {
@@ -250,6 +495,21 @@ select {
   margin: 0;
   font-size: 20px;
   color: var(--zh-deep-blue);
+}
+.rename-input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--zh-border);
+  border-radius: 10px;
+  background: var(--zh-card);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.rename-input:focus {
+  border-color: var(--zh-cyan);
+  box-shadow: 0 0 0 3px rgba(126, 205, 235, 0.25);
 }
 .preview-meta {
   display: flex;
@@ -438,5 +698,8 @@ select {
   }
   .preview-panel {
     padding: 18px;
+  }
+  .preview-head {
+    flex-direction: column;
   }
 }

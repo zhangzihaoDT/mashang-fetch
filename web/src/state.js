@@ -9,6 +9,7 @@ export const initialState = {
   status: STATUS.EMPTY,
   files: [],
   activeId: null,
+  activeScope: null,
   preview: null,
   message: '',
   error: '',
@@ -21,24 +22,40 @@ export function reducer(state, action) {
       return { ...state, files: action.files }
 
     case 'preview/loading':
-      return { ...state, activeId: action.id, previewLoading: true, error: '' }
+      return {
+        ...state,
+        activeId: action.id,
+        activeScope: action.scope,
+        previewLoading: true,
+        error: '',
+      }
 
     case 'preview/loaded':
       return {
         ...state,
         activeId: action.preview.id,
+        activeScope: action.preview.scope,
         preview: action.preview,
         previewLoading: false,
       }
 
     case 'preview/clear':
-      return { ...state, activeId: null, preview: null, previewLoading: false }
+      return {
+        ...state,
+        activeId: null,
+        activeScope: null,
+        preview: null,
+        previewLoading: false,
+      }
 
     case 'fetch/start':
       return { ...state, status: STATUS.FETCHING, message: 'Fetching…', error: '' }
 
     case 'fetch/error':
       return { ...state, status: STATUS.ERROR, message: '', error: action.error }
+
+    case 'notice':
+      return { ...state, message: action.message || '', error: action.error || '' }
 
     case 'fetch/success':
       return {

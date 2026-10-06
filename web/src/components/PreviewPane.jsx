@@ -1,4 +1,3 @@
-import { api } from '../api.js'
 import { formatSize } from '../utils.js'
 import EmptyState from './EmptyState.jsx'
 import PreviewBody from './PreviewBody.jsx'
@@ -26,7 +25,7 @@ function MetaRow({ preview }) {
   )
 }
 
-export default function PreviewPane({ preview, loading, status }) {
+export default function PreviewPane({ preview, loading }) {
   if (loading) {
     return (
       <section className="panel preview-panel">
@@ -47,9 +46,6 @@ export default function PreviewPane({ preview, loading, status }) {
     <section className="panel preview-panel">
       <div className="preview-head">
         <h2 className="preview-title">{preview.title}</h2>
-        <a className="btn secondary" href={api.downloadUrl(preview.id)} download>
-          ↓ Download
-        </a>
       </div>
       <MetaRow preview={preview} />
       <PreviewBody preview={preview} />

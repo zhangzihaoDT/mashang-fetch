@@ -1,21 +1,27 @@
 """API 服务层：把核心能力整理成 JSON 友好的结构。
 
-Link → File → Preview → Download
+Inbox（workspace）→ 资料库（library）
+Fetch / Convert → Preview → Keep / Rename / Delete / Download
 """
 from datetime import datetime
 from pathlib import Path
 
+from app import manage, storage
 from app.fetch import fetch
 from app.preview import OUTPUT_DIR, load, list_outputs, parse_front_matter
 
+SCOPES = storage.SCOPES
 
-def resolve_id(file_id):
-    """把前端传来的 id 解析为 output 目录内的绝对路径，拒绝越界访问。"""
-    base = OUTPUT_DIR.resolve()
-    target = (base / file_id).resolve()
-    if target != base and base not in target.parents:
-        raise ValueError("非法路径")
-    return target
+
+def _check_scope(scope):
+    if scope not in SCOPES:
+        raise ValueError("未知文件空间")
+    return scope
+
+
+def resolve_id(scope, file_id):
+    """把前端传来的 id 解析为指定空间内的绝对路径，拒绝越界访问。"""
+    return storage.resolve(_check_scope(scope), file_id)
 
 
 def _iso(ts):
@@ -44,11 +50,12 @@ def _title(path):
     return p.stem
 
 
-def file_record(path):
+def file_record(path, scope):
     """文件列表 / 预览头部的结构化记录。"""
     p = Path(path)
+    base = storage.dir_for(scope).resolve()
     try:
-        file_id = str(p.resolve().relative_to(OUTPUT_DIR.resolve()))
+        file_id = str(p.resolve().relative_to(base))
     except ValueError:
         file_id = p.name
     try:
@@ -59,6 +66,7 @@ def file_record(path):
     return {
         "id": file_id,
         "name": p.name,
+        "scope": scope,
         "title": _title(path),
         "format": p.suffix.lstrip(".").lower(),
         "size": size,
@@ -66,21 +74,92 @@ def file_record(path):
     }
 
 
-def list_files():
-    return [file_record(path) for _, path in list_outputs()]
+def list_files(scope="workspace"):
+    scope = _check_scope(scope)
+    return [file_record(path, scope) for _, path in list_outputs(storage.dir_for(scope))]
 
 
 def fetch_url(url, fmt="md"):
     result = fetch(url, fmt)
     if result.get("ok"):
-        result["file"] = file_record(result["path"])
+        result["file"] = file_record(result["path"], storage.WORKSPACE)
     return result
 
 
-def preview(file_id):
-    path = resolve_id(file_id)
+def config():
+    """运行配置：两个空间的目录。"""
+    return {
+        "workspace_dir": str(storage.WORKSPACE_DIR),
+        "library_dir": str(storage.LIBRARY_DIR),
+    }
+
+
+def rename(scope, file_id, name):
+    """重命名指定空间的文件，返回新的文件记录。"""
+    scope = _check_scope(scope)
+    path = manage.rename(scope, file_id, name)
+    return {"file": file_record(path, scope)}
+
+
+def delete(scope, file_id):
+    """永久删除指定空间的文件。"""
+    scope = _check_scope(scope)
+    manage.delete(scope, file_id)
+    return {"ok": True}
+
+
+def keep(file_id):
+    """把 Inbox 文件移动（转移）到资料库，返回新的文件记录。"""
+    dst = manage.keep(file_id)
+    return {
+        "ok": True,
+        "name": dst.name,
+        "path": str(dst),
+        "scope": storage.LIBRARY,
+        "library_dir": str(storage.LIBRARY_DIR),
+        "file": file_record(dst, storage.LIBRARY),
+    }
+
+
+def batch(scope, action, ids):
+    """批量文件操作：逐项执行，返回成功与失败清单。
+
+    action: "delete" | "move_to_library"
+    单个文件失败不影响其他文件，便于文件整理场景。
+    """
+    scope = _check_scope(scope)
+    if action not in ("delete", "move_to_library"):
+        raise ValueError("不支持的操作")
+    if action == "move_to_library" and scope != storage.WORKSPACE:
+        raise ValueError("只有 Inbox 可以移入资料库")
+    if not ids:
+        raise ValueError("未选择文件")
+
+    succeeded, failed = [], []
+    for file_id in ids:
+        try:
+            if action == "delete":
+                manage.delete(scope, file_id)
+            else:
+                manage.keep(file_id)
+            succeeded.append(file_id)
+        except ValueError as exc:
+            failed.append({"id": file_id, "error": str(exc)})
+
+    return {
+        "ok": True,
+        "scope": scope,
+        "action": action,
+        "succeeded": succeeded,
+        "failed": failed,
+    }
+
+
+def preview(scope, file_id):
+    scope = _check_scope(scope)
+    path = resolve_id(scope, file_id)
     data = load(str(path))
-    record = file_record(path)
+    record = file_record(path, scope)
     kind = data.get("kind")
     record["kind"] = kind
     record["meta"] = {}

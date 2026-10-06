@@ -12,27 +12,37 @@ const FALLBACK_FORMATS = [
   { label: 'CSV', value: 'csv' },
 ]
 
+const EMPTY_LISTS = { workspace: [], library: [] }
+
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [url, setUrl] = useState('')
   const [format, setFormat] = useState('md')
   const [formats, setFormats] = useState(FALLBACK_FORMATS)
+  const [scope, setScope] = useState('workspace')
+  const [lists, setLists] = useState(EMPTY_LISTS)
+  const [dirs, setDirs] = useState({ workspace_dir: '', library_dir: '' })
 
   const loadFiles = useCallback(async () => {
-    const { files } = await api.files()
-    dispatch({ type: 'files/loaded', files })
-    return files
+    const [workspace, library] = await Promise.all([api.files('workspace'), api.files('library')])
+    const next = { workspace: workspace.files, library: library.files }
+    setLists(next)
+    return next
   }, [])
 
   useEffect(() => {
     api.formats().then((r) => setFormats(r.formats)).catch(() => {})
+    api
+      .config()
+      .then((r) => setDirs(r))
+      .catch(() => {})
     loadFiles().catch(() => {})
   }, [loadFiles])
 
-  const selectFile = useCallback(async (id) => {
-    dispatch({ type: 'preview/loading', id })
+  const selectFile = useCallback(async (targetScope, id) => {
+    dispatch({ type: 'preview/loading', scope: targetScope, id })
     try {
-      const preview = await api.preview(id)
+      const preview = await api.preview(targetScope, id)
       dispatch({ type: 'preview/loaded', preview })
     } catch (err) {
       dispatch({ type: 'fetch/error', error: err.message })
@@ -51,12 +61,13 @@ export default function App() {
         dispatch({ type: 'fetch/error', error: result.error || '转换失败' })
         return
       }
-      const files = await loadFiles()
-      const preview = await api.preview(result.file.id)
+      const next = await loadFiles()
+      const preview = await api.preview('workspace', result.file.id)
+      setScope('workspace')
       dispatch({
         type: 'fetch/success',
         message: `已生成 ${result.file.name}`,
-        files,
+        files: next.workspace,
         preview,
       })
     } catch (err) {
@@ -65,11 +76,88 @@ export default function App() {
   }, [url, format, loadFiles])
 
   const refresh = useCallback(async () => {
-    const files = await loadFiles()
-    if (state.activeId && !files.some((f) => f.id === state.activeId)) {
+    const next = await loadFiles()
+    if (
+      state.activeScope &&
+      state.activeId &&
+      !next[state.activeScope].some((f) => f.id === state.activeId)
+    ) {
       dispatch({ type: 'preview/clear' })
     }
-  }, [loadFiles, state.activeId])
+  }, [loadFiles, state.activeScope, state.activeId])
+
+  const keepFile = useCallback(
+    async (id) => {
+      try {
+        const result = await api.keep(id)
+        await loadFiles()
+        if (state.activeScope === 'workspace' && state.activeId === id) {
+          await selectFile('library', result.file.id)
+        }
+        dispatch({ type: 'notice', message: `已移入资料库：${result.file.name}` })
+      } catch (err) {
+        dispatch({ type: 'notice', error: err.message })
+      }
+    },
+    [loadFiles, selectFile, state.activeScope, state.activeId],
+  )
+
+  const renameFile = useCallback(
+    async (targetScope, id, name) => {
+      try {
+        const result = await api.rename(targetScope, id, name)
+        await loadFiles()
+        if (state.activeScope === targetScope && state.activeId === id) {
+          await selectFile(targetScope, result.file.id)
+        }
+        dispatch({ type: 'notice', message: `已重命名为 ${result.file.name}` })
+      } catch (err) {
+        dispatch({ type: 'notice', error: err.message })
+      }
+    },
+    [loadFiles, selectFile, state.activeScope, state.activeId],
+  )
+
+  const deleteFile = useCallback(
+    async (targetScope, id) => {
+      await api.remove(targetScope, id)
+      const next = await loadFiles()
+      if (state.activeScope === targetScope && state.activeId === id) {
+        const prevList = lists[targetScope]
+        const idx = prevList.findIndex((f) => f.id === id)
+        const remaining = next[targetScope]
+        const nextFile = remaining[Math.min(idx, remaining.length - 1)]
+        if (nextFile) await selectFile(targetScope, nextFile.id)
+        else dispatch({ type: 'preview/clear' })
+      }
+      dispatch({ type: 'notice', message: '已删除' })
+    },
+    [loadFiles, selectFile, lists, state.activeScope, state.activeId],
+  )
+
+  const batchFiles = useCallback(
+    async (targetScope, action, ids) => {
+      const result = await api.batch(targetScope, action, ids)
+      await loadFiles()
+      if (state.activeScope === targetScope && ids.includes(state.activeId)) {
+        dispatch({ type: 'preview/clear' })
+      }
+      const done = result.succeeded.length
+      const skipped = result.failed.length
+      if (done === 0 && skipped > 0) {
+        dispatch({ type: 'notice', error: result.failed[0].error })
+      } else if (action === 'move_to_library') {
+        dispatch({
+          type: 'notice',
+          message: `已移入资料库 ${done} 个文件${skipped ? `，跳过 ${skipped} 个同名文件` : ''}`,
+        })
+      } else {
+        dispatch({ type: 'notice', message: `已删除 ${done} 个文件` })
+      }
+      return result
+    },
+    [loadFiles, state.activeScope, state.activeId],
+  )
 
   return (
     <div className="app">
@@ -89,16 +177,20 @@ export default function App() {
 
       <div className="workspace">
         <FileSidebar
-          files={state.files}
+          scope={scope}
+          onScopeChange={setScope}
+          lists={lists}
           activeId={state.activeId}
+          activeScope={state.activeScope}
+          libraryDir={dirs.library_dir}
           onSelect={selectFile}
           onRefresh={refresh}
+          onKeep={keepFile}
+          onRename={renameFile}
+          onDelete={deleteFile}
+          onBatch={batchFiles}
         />
-        <PreviewPane
-          preview={state.preview}
-          loading={state.previewLoading}
-          status={state.status}
-        />
+        <PreviewPane preview={state.preview} loading={state.previewLoading} />
       </div>
     </div>
   )

@@ -3,14 +3,13 @@ import csv
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-OUTPUT_DIR = ROOT / "output"
+from app.storage import OUTPUT_DIR
 
 PREVIEWABLE_EXTS = {".md", ".csv", ".json"}
 
 
 def list_outputs(out_dir=None):
-    """列出 output 目录下可预览的文件，最新的在前。"""
+    """列出目录下可预览的文件，最新的在前。默认列出 Inbox（output/）。"""
     out_dir = Path(out_dir) if out_dir else OUTPUT_DIR
     if not out_dir.exists():
         return []
