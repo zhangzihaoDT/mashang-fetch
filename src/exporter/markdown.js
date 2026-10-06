@@ -6,6 +6,10 @@ function yamlString(value) {
     return text;
 }
 
+function escapeInline(text) {
+    return String(text == null ? '' : text).replace(/~~/g, '\\~\\~');
+}
+
 function render(doc) {
     const lines = ['---'];
     lines.push(`title: ${yamlString(doc.title)}`);
@@ -18,11 +22,11 @@ function render(doc) {
     lines.push('---', '');
 
     let content = lines.join('\n');
-    content += `# ${doc.title}\n\n`;
+    content += `# ${escapeInline(doc.title)}\n\n`;
     if (doc.author) {
-        content += `> 作者：${doc.author}\n\n`;
+        content += `> 作者：${escapeInline(doc.author)}\n\n`;
     }
-    content += doc.body + '\n';
+    content += escapeInline(doc.body) + '\n';
 
     return content;
 }
