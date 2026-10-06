@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { fileIcon, formatTime } from '../utils.js'
 
@@ -44,6 +44,7 @@ export default function FileSidebar({
   const [confirming, setConfirming] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const listRef = useRef(null)
 
   useEffect(() => {
     setQuery('')
@@ -79,6 +80,58 @@ export default function FileSidebar({
       .map(([dir, items]) => ({ dir, items }))
       .sort((a, b) => (a.dir === '' ? -1 : b.dir === '' ? 1 : a.dir.localeCompare(b.dir)))
   }, [filtered])
+
+  const visibleFiles = useMemo(() => {
+    const list = []
+    for (const { dir, items } of groups) {
+      if (dir === '' || filtering || expanded.has(dir)) list.push(...items)
+    }
+    return list
+  }, [groups, filtering, expanded])
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
+      if (selectMode || renaming) return
+      const target = e.target
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return
+      }
+      if (visibleFiles.length === 0) return
+      e.preventDefault()
+      const currentIndex = visibleFiles.findIndex(
+        (f) => f.id === activeId && activeScope === scope,
+      )
+      let nextIndex
+      if (currentIndex === -1) {
+        nextIndex = e.key === 'ArrowDown' ? 0 : visibleFiles.length - 1
+      } else {
+        nextIndex = currentIndex + (e.key === 'ArrowDown' ? 1 : -1)
+        nextIndex = Math.max(0, Math.min(visibleFiles.length - 1, nextIndex))
+      }
+      const next = visibleFiles[nextIndex]
+      if (next && !(next.id === activeId && activeScope === scope)) {
+        onSelect(scope, next.id)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [visibleFiles, activeId, activeScope, scope, selectMode, renaming, onSelect])
+
+  useEffect(() => {
+    if (!activeId || activeScope !== scope) return
+    const node = [...(listRef.current?.querySelectorAll('[data-file-id]') || [])].find(
+      (el) => el.dataset.fileId === activeId,
+    )
+    if (node) node.scrollIntoView({ block: 'nearest' })
+  }, [activeId, activeScope, scope])
 
   const selectedFiles = useMemo(
     () => files.filter((f) => selected.has(f.id)),
@@ -190,6 +243,7 @@ export default function FileSidebar({
     return (
       <div
         key={f.id}
+        data-file-id={f.id}
         className={`file-item${isActive ? ' active' : ''}${selectMode ? ' selecting' : ''}`}
       >
         <div className="file-row">
@@ -376,7 +430,7 @@ export default function FileSidebar({
         </div>
       )}
 
-      <div className="file-list">
+      <div className="file-list" ref={listRef}>
         {filtered.length === 0 && (
           <p className="muted small">
             {filtering
