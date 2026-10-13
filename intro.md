@@ -1,48 +1,47 @@
-[用户输入链接]
-       ↓
-[Resolver]    识别域名 / 选择抓取策略
-       ↓
-[Extractor]   axios 或 puppeteer 抓取 + 正文/表格抽取
-       ↓
-[Normalizer]  结构化文档：title / source / author / fetched_at / body / tables
-       ↓
-[Exporter]    导出 .md / .csv
-       ↓
-[Inbox]       output/{时间}_{标题}.{md|csv}   ← 暂存区
-       ↓
-[Preview]     读取 → 按类型渲染（Markdown / 表格 / JSON / 文本）
-       ↓
-[Manage]      Rename / Delete / Download
-       ↓
-[移入资料库]    移动到 50_外部资料（Inbox 不再保留）
-       ↓
-[资料库]       浏览 / 搜索 / 改名 / 删除 / 下载
-       ↓
-myknbase Import
+# mashang-fetch：获取与整理本地资料
 
-## 设计原则
+项目协助把网页正文、表格和 PDF 附件获取到本地，再按文件夹分类、预览、归档。成功标准是资料是否正确保存，以及整理结构是否保留。
 
-mashang-fetch 的核心是 **Fetch / Convert**：把外部资源尽可能转换成用户需要的
-本地结构化文件。成功标准是「文件有没有正确生成」，而不是「AI 有没有理解」。
+## 获取流程
 
-Preview 的第一职责是忠实呈现转换结果，不经过任何模型。
+```text
+用户输入链接，选择获取方式
+├─ 网页正文（Markdown）/ 网页表格（CSV）
+│  Resolver → Extractor → Normalizer → Exporter → .md / .csv
+└─ PDF 附件
+   请求链接 → 直接 PDF 或解析当前网页附件
+   ├─ 单个附件：自动获取
+   └─ 多个附件：用户选择或全部获取
+   下载 → 校验 PDF 文件头 → .pdf + 隐藏来源记录
+                         ↓
+                  Inbox（output/）
+                         ↓
+            查看 / 分类 / 重命名 / 归档
+                         ↓
+       资料库（保留相对路径，供 myknbase 导入）
+```
 
-Inbox（output/）是暂存区：抓取结果先落在这里，可预览、可改名、可删除、可下载。
-「移入资料库」把文件移动到 50_外部资料（供 myknbase 导入），是空间之间的转移，
-Inbox 中不再保留；同名不覆盖、不建副本，源文件保留。
-资料库中的文件也可以直接浏览、搜索、改名、删除、下载。
+PDF 获取不依赖模型，不改写原文件；不将普通网页转换为 PDF。当前附件发现限于普通 HTML 链接，动态加载附件暂未支持。
 
-## 管理动作语义
+## 界面职责
 
-- 移入资料库：我要留下（从 Inbox 移动到资料库）
-- Rename：我想改文件名（只改文件名，不动内容）
-- Download：我要拿一份出来
-- Delete：我不要了（从所在空间永久删除）
+- 顶部：输入链接、选择获取方式、启动 Fetch、显示获取结果；多个 PDF 附件时显示选择列表。
+- 左侧：切换 Inbox / 资料库、搜索与选择文件、批量整理、整个文件夹归档。「打开文件夹」进入当前空间，目录信息按需展开或复制。
+- 右侧详情顶部：展示资料名称、格式、大小和时间；在 Finder 中定位文件、移入资料库；更多菜单提供重命名、下载副本、删除。
+- 右侧内容区：忠实预览 Markdown、CSV、JSON 或 PDF。PDF 使用 PDF.js 渲染并支持翻页；来源页面、附件地址与实际文件名收在折叠区。
 
-## Pipeline 说明
+## 文件管理语义
 
-1. Resolver：规范化 URL，按域名分类策略（`mp.weixin.qq.com` 走 Axios，其余走 Puppeteer），短链解析留作扩展点。
-2. Extractor：抓取页面并抽取正文与表格数据。
-3. Normalizer：清洗并组织为统一文档模型，附来源与抓取时间。
-4. Exporter：渲染为 Markdown（含 front matter）或 CSV。
-5. Preview：按扩展名分发渲染，绝不改写内容。
+- Fetch：资料保存到 Inbox，不自动在浏览器下载第二份。
+- 移入资料库：保留分类结构的移动。`Inbox/规划/项目A.pdf` → `资料库/规划/项目A.pdf`；同名目录合并，完整路径冲突才跳过并保留源文件。失败项不影响其他文件，移动后空出的目录自动清理。
+- 文件夹归档：递归处理该目录中的全部普通文件，包括界面未显示的其他类型文件。
+- 重命名：修改文件名，保留扩展名；PDF 来源记录与展示标题同步维护。
+- 下载副本：用户主动另存一份，原文件保留。
+- 删除：从当前空间永久删除，操作前确认。
+- Finder：打开当前空间的目录，或定位当前文件；仅支持本机 macOS。
+
+## 来源与路径
+
+Markdown 使用 YAML front matter 保存来源；PDF 使用同目录隐藏的 `.{PDF文件名}.source.json` 保存资料名称、来源页面、实际下载地址和获取时间。来源记录随 PDF 移动、重命名和删除。
+
+Inbox 为项目 `output/`；资料库默认为 `~/Documents/github/notes/50_外部资料`，可通过 `MASHANG_FETCH_KEEP_DIR` 配置。详细安装、命令行及 API 说明见 [README](README.md)。

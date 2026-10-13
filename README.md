@@ -1,16 +1,17 @@
 # mashang-fetch
 
-把外部资源链接转换为本地结构化文件，在 **Inbox → 资料库** 两个空间之间预览、整理、留存。
+获取网页正文、表格与 PDF 附件，保存为本地文件，在 **Inbox → 资料库** 两个空间之间预览、分类、归档。
 
-**Link → File → Preview → 移入资料库 / Rename / Delete / Download**
+**链接 → 获取资料 → Inbox → 查看与整理 → 移入资料库**
 
-mashang-fetch 的成功标准只有一个：**文件有没有被正确生成**，而不是 AI 有没有理解内容。
+mashang-fetch 的成功标准只有一个：**资料有没有被正确获取并保存**，而不是 AI 有没有理解内容。
 
 ## 两个文件空间
 
 ```
 ① Fetch / Convert
-   URL → Resolver → Extractor → Normalizer → Exporter → 本地文件 (.md / .csv)
+   网页正文 / 表格 → Resolver → Extractor → Normalizer → Exporter → .md / .csv
+   PDF 直链 / 网页附件 → 识别附件 → 选择（多个时）→ 下载与校验 → .pdf
 
 ② Inbox → 资料库
    Inbox（output/，暂存）  →  File（列表 / 选中）
@@ -40,17 +41,17 @@ myknbase Import
 
 - **Fetch / Convert**：能力集中在外部资源的获取与解析，输出可追溯的本地文件。
 - **Inbox / 资料库**：两个文件空间。Inbox 是 `output/` 暂存区；资料库是长期保存目录（默认 `50_外部资料`）。左侧用标签页切换。
-- **File**：文件资源层。列表、搜索、选中以及 Rename / 移入资料库 / Download / Delete 都归于此；Preview 不承载操作。
-- **Preview**：第一职责是忠实呈现转换结果。`.md` → Markdown 渲染，`.csv` → 表格，`.json` → 格式化，其余 → 文本兜底。
+- **File**：文件资源层。列表、搜索、选中以及 Rename / 移入资料库 / Download / Delete 都归于此。单文件操作在右侧详情顶部，批量操作在左侧选择工具栏。
+- **Preview**：第一职责是忠实呈现转换结果。`.md` → Markdown 渲染，`.csv` → 表格，`.json` → 格式化，`.pdf` → PDF.js 原文件预览（支持翻页）。
 - **移入资料库**：把 Inbox 文件**按原相对目录移动**到资料库，Inbox 中不再保留；同名时不覆盖、不创建副本，直接提示「已存在」并保留源文件。资料库中的文件不再显示该操作。
 - **Rename / Delete / Download**：在两个空间分别生效，互不影响。
 
 ## 主要功能
 
-- **链接转文件**：输入 URL，按域名解析抓取策略，导出 Markdown 或 CSV，或下载链接指向的 PDF 原文件。
+- **链接转文件**：输入 URL，按域名解析抓取策略，导出 Markdown 或 CSV，或下载 PDF 直链及网页中的 PDF 附件；单附件自动获取，多附件支持选择。
 - **结构化输出**：`.md` 带 YAML front matter（title / source / author / fetched_at），文件自描述、可追溯来源。
 - **忠实预览**：按文件类型渲染，不经过任何模型。
-- **双空间管理**：Inbox 暂存、资料库长期保存；两处都支持搜索、Rename、Download、Delete（行内二次确认）。
+- **双空间管理**：Inbox 暂存、资料库长期保存；两处都支持搜索、Rename、Download、Delete（删除前确认）。
 - **批量操作**：勾选多个文件后可**批量移入资料库**（Inbox）与**批量删除**；支持全选当前列表或搜索结果。移入时同名文件跳过并保留源文件，其余正常移动。
 - **长期保存**：一键把 Inbox 文件移入资料库，作为 myknbase 的导入来源。
 
@@ -58,7 +59,7 @@ myknbase Import
 
 - **核心引擎（Node.js）**：`Resolver → Extractor → Normalizer → Exporter`，负责抓取与转换。
 - **Web 服务（Python + FastAPI）**：`server.py` 提供 `/api` 接口，并托管前端构建产物。
-- **前端（React + Vite）**：`web/`，三段式界面（顶部任务栏 + 左文件 + 右预览），状态机 `EMPTY → FETCHING → SUCCESS / ERROR`。
+- **前端（React + Vite）**：`web/`，三段式界面（顶部任务栏 + 左文件 + 右预览），状态机 `EMPTY → FETCHING → READY / ERROR`，多个 PDF 附件先进入选择流程。
 
 数据流：
 
@@ -74,8 +75,8 @@ React (web/dist)  ──REST──▶  FastAPI (server.py)  ──▶  app/servi
 
 ### 前提条件
 
-- Node.js 14+
-- Python 3.8+
+- Node.js 22.13+（前端 PDF.js 依赖要求）
+- Python 3.10+（后端使用现代类型注解）
 
 ### 安装步骤
 
@@ -105,15 +106,16 @@ npm run up     # 启动（后台运行）
 npm run down   # 停止
 ```
 
-在浏览器打开 `http://127.0.0.1:7860`：输入 URL → 选择 Format → **Fetch** → 自动进入 **Inbox** 并选中新文件预览。左侧 **打开文件夹** 打开当前 Inbox 或资料库；详情顶部 **在 Finder 中显示** 定位选中的文件（macOS）。目录路径收在「目录信息」中，可查看和复制。
+在浏览器打开 `http://127.0.0.1:7860`：输入 URL → 选择获取方式（网页正文 / 网页表格 / PDF 附件） → **Fetch** → 自动进入 **Inbox** 并选中新文件预览。左侧 **打开文件夹** 打开当前 Inbox 或资料库；详情顶部 **在 Finder 中显示** 定位选中的文件（macOS）。目录路径收在「目录信息」中，可查看和复制。
 
-左侧 **Files** 面板顶部可切换两个空间：**Inbox**（暂存）与 **资料库**（长期保存），各自带文件数量与搜索框。点击 **选择** 进入选择模式，文件行出现复选框，顶部工具栏按选中数量显示可用操作：
+左侧文件面板切换 **Inbox** 与 **资料库**，支持搜索、文件夹分组与键盘上下选择。
 
-- **选中 1 个**：移入资料库（仅 Inbox）/ Rename / Download / Delete；
-- **选中多个**：批量移入资料库（仅 Inbox）/ 批量删除（Rename、Download 暂不支持批量）；
-- 支持全选当前列表或搜索结果，删除会在工具栏内二次确认并列出文件名。
+- **当前文件**：右侧详情顶部可在 Finder 中定位、移入资料库（仅 Inbox）；「更多」包含重命名、下载副本和删除。正文区域只负责预览，来源信息默认折叠。
+- **批量整理**：左侧点击「选择」，勾选文件后批量移入资料库或删除；支持全选当前搜索结果。
+- **文件夹归档**：Inbox 文件夹行的「移入资料库」递归归档该文件夹内的全部普通文件，包括当前搜索未展示的文件。
+- **保留分类**：`Inbox/规划公示/项目A.pdf` → `资料库/规划公示/项目A.pdf`。同名目录合并；完整目标路径冲突时跳过并保留源文件，不影响其他文件。来源记录随 PDF 移动，移动后空出的目录自动清理。
 
-文件操作统一收敛在顶部工具栏，右侧 Preview 只负责忠实展示当前文件，不承载操作。「移入资料库」是空间之间的移动，Inbox 中不再保留该文件。
+Fetch 成功后资料已保存到项目的 `output/`，不会自动在浏览器下载第二份。只有主动选择「下载副本」才另存一份。
 
 - 后台运行时 PID 与日志统一放在 `.local/`（`app.pid`、`app.log`）。
 - 可用 `HOST` / `PORT` 覆盖服务的地址与端口，例如 `PORT=7861 npm run up`。
@@ -148,7 +150,7 @@ node src/cli.js <url> --format md|csv|pdf [--out DIR]
 
 ### 下载 PDF
 
-界面中选择 **PDF（原文件）**，粘贴 PDF 直链或包含 PDF 附件的网页链接并点击 Fetch。文件保存到 Inbox（`output/`），支持 Rename、Download、Delete 和移入资料库。支持重定向，以及没有 `.pdf` 后缀的下载地址；下载时校验 PDF 文件头，错误页不会保存为 PDF。
+界面中选择 **PDF 附件**，粘贴 PDF 直链或包含 PDF 附件的网页链接并点击 Fetch。文件保存到 Inbox（`output/`），支持 Rename、Download、Delete 和移入资料库。支持重定向，以及没有 `.pdf` 后缀的下载地址；下载时校验 PDF 文件头，错误页不会保存为 PDF。
 
 ```bash
 node src/cli.js https://example.com/report.pdf --format pdf
@@ -158,7 +160,9 @@ node src/cli.js https://example.com/report.pdf --format pdf
 
 ## 输出文件
 
-- 命名：`{YYYYMMDD_HHMMSS}_{标题}.{md|csv}`
+- Markdown / CSV：`{YYYYMMDD_HHMMSS}_{标题}.{md|csv}`。
+- PDF：`{YYYYMMDD_HHMMSS}_{附件名称}_{随机后缀}.pdf`（时间戳使用 UTC，避免重复下载覆盖）；界面使用资料名称展示标题。
+- PDF 来源记录：同目录下的隐藏文件 `.{PDF文件名}.source.json`，包含 `title / source / download_url / fetched_at`；不在文件列表中显示，随 PDF 的重命名、归档和删除维护。
 - `.md` 头部包含 YAML front matter：
 
 ```yaml
@@ -190,14 +194,15 @@ mashang-fetch/
 │       ├── api.js          # API 客户端
 │       ├── state.js        # reducer / 初始状态
 │       ├── styles.css
-│       └── components/     # Header / FetchBar / FileSidebar / FileActions / PreviewPane ...
+│       └── components/     # Header / FetchBar / FileSidebar / PreviewPane / PdfPreview ...
 ├── src/                    # Node 核心引擎
 │   ├── cli.js              # 统一入口
+│   ├── pdf.js              # PDF 直链下载、网页附件识别与选择
 │   ├── resolver.js         # URL 分类 → 选择抓取策略
 │   ├── extractor/          # 抓取与正文/表格抽取
 │   ├── normalizer.js       # 结构化文档模型
 │   └── exporter/           # Markdown / CSV 导出
-├── tests/test_api.py       # API 冒烟测试
+├── tests/                  # API / PDF 下载 / 保留目录归档测试
 ├── scripts/dev.sh          # 本地进程管理（up / down）
 ├── scripts/test.sh         # 测试运行器
 ├── .local/                 # 运行期 PID 与日志（不纳入版本管理）
@@ -211,22 +216,40 @@ mashang-fetch/
 | GET | `/api/formats` | 支持的输出格式 |
 | GET | `/api/config` | 运行配置（Inbox 与资料库目录） |
 | GET | `/api/files?scope=` | 指定空间的文件列表（`workspace` / `library`） |
-| POST | `/api/fetch` | `{url, format}` → 生成文件到 Inbox |
-| GET | `/api/preview?scope=&id=` | 预览数据（markdown / table / json / text） |
-| POST | `/api/keep` | `{id}` → 把 Inbox 文件移入资料库 |
+| POST | `/api/fetch` | `{url, format, attachments?}` → 获取资料；`format` 为 `md` / `csv` / `pdf` |
+| GET | `/api/preview?scope=&id=` | 预览数据（markdown / table / json / text / pdf） |
+| GET | `/api/view?scope=&id=` | PDF 原文件流（inline，供 PDF.js 读取） |
+| POST | `/api/open-inbox?scope=&id=` | macOS Finder 打开当前空间；传入 id 时定位文件 |
+| POST | `/api/keep` | `{id}` → 保留相对目录，把 Inbox 文件移入资料库 |
 | POST | `/api/rename` | `{scope, id, name}` → 重命名文件 |
 | POST | `/api/delete` | `{scope, id}` → 永久删除文件 |
-| POST | `/api/batch` | `{scope, action, ids}` → 批量操作（`move_to_library` / `delete`） |
+| POST | `/api/batch` | `{scope, action, ids}` → 批量操作（`move_to_library` / `delete`）；归档 ids 可包含文件夹路径 |
 | GET | `/api/download?scope=&id=` | 下载文件 |
+
+### PDF 返回结果
+
+PDF 直链返回单文件结果（`path / filename / format / meta`）；网页附件下载返回 `results` 和 `failed`，单项失败不影响其他附件。API 额外提供 `file`，多个结果时提供 `files`。
+
+网页发现多个附件且尚未选择时，返回 `needs_selection: true`、`source` 和 `attachments: [{url, name}]`，此时还没有生成文件。界面展示选择列表；CLI 可再次执行：
+
+```bash
+node src/cli.js 'https://example.com/page' --format pdf \
+  --attachments '["https://example.com/report.pdf"]'
+```
+
+API 对应在 `/api/fetch` 请求中传入 `attachments` URL 列表，后端验证其属于该页面的候选附件。全部失败时 `ok: false`；部分成功时返回成功结果和失败原因。
 
 ## 测试
 
 ```bash
-npm test    # 运行 API 冒烟测试（unittest + FastAPI TestClient）
+npm test    # API、PDF 获取、目录归档回归测试（PDF 测试使用本机 HTTP 服务）
 ```
 
-## v0.1 非目标
+## 当前限制
 
+- PDF 附件识别限于当前页面中的普通 HTML 链接，不递归爬取其他页面；暂不支持动态加载、登录后才能访问的附件。
+- 多附件 CLI 调用先返回候选列表，不自动下载全部附件。
+- Finder 入口仅支持运行在本机 macOS 的服务。
 - 视频站（B 站等）的专用 Resolver
 - 网页转 PDF、PDF 正文解析、图片导出
 - 微信正文内图片抓取
@@ -234,7 +257,3 @@ npm test    # 运行 API 冒烟测试（unittest + FastAPI TestClient）
 ## 许可证
 
 本项目采用 MIT 许可证 - 详情请参见 LICENSE 文件
-
-### 保留分类目录归档
-
-`Inbox/规划公示/项目A.pdf` 移入后为 `资料库/规划公示/项目A.pdf`。同名目录合并，完整目标路径同名时跳过并保留源文件；不同目录的同名文件可正常移动。文件夹行的「移入资料库」递归归档其中全部文件（包括未显示的普通文件），失败项保留在 Inbox。PDF 来源记录随文件移动，移动后空出的目录自动清理。
