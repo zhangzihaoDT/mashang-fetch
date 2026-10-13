@@ -51,6 +51,9 @@ export function reducer(state, action) {
     case 'fetch/start':
       return { ...state, status: STATUS.FETCHING, message: 'Fetching…', error: '' }
 
+    case 'fetch/selection':
+      return { ...state, status: STATUS.READY, message: '请选择要下载的 PDF 附件', error: '' }
+
     case 'fetch/error':
       return { ...state, status: STATUS.ERROR, message: '', error: action.error }
 

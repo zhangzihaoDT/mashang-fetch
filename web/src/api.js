@@ -14,6 +14,8 @@ async function parse(res) {
 }
 
 export const api = {
+  openInbox: (scope = 'workspace', id) => fetch(`/api/open-inbox?scope=${encodeURIComponent(scope)}${id !== undefined ? '&id=' + encodeURIComponent(id) : ''}`, { method: 'POST' }).then(parse),
+  viewUrl: (scope, id) => `/api/view?scope=${encodeURIComponent(scope)}&id=${encodeURIComponent(id)}`,
   config: () => fetch('/api/config').then(parse),
   formats: () => fetch('/api/formats').then(parse),
   files: (scope = 'workspace') =>
@@ -24,11 +26,11 @@ export const api = {
     ),
   downloadUrl: (scope, id) =>
     `/api/download?scope=${encodeURIComponent(scope)}&id=${encodeURIComponent(id)}`,
-  fetchUrl: (url, format) =>
+  fetchUrl: (url, format, attachments) =>
     fetch('/api/fetch', {
       method: 'POST',
       headers: JSON_HEADERS,
-      body: JSON.stringify({ url, format }),
+      body: JSON.stringify({ url, format, attachments }),
     }).then(parse),
   keep: (id) =>
     fetch('/api/keep', {

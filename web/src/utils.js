@@ -1,4 +1,4 @@
-const ICONS = { md: '📄', csv: '📊', json: '🧾' }
+const ICONS = { md: '📄', csv: '📊', json: '🧾', pdf: '📄' }
 
 export function fileIcon(format) {
   return ICONS[format] || '📎'

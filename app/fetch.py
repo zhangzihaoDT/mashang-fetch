@@ -6,20 +6,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CLI = ROOT / "src" / "cli.js"
 
-FORMATS = {"Markdown": "md", "CSV": "csv"}
+FORMATS = {"网页正文（Markdown）": "md", "网页表格（CSV）": "csv", "PDF 附件": "pdf"}
 
 
-def fetch(url, fmt="md", out_dir=None, timeout=600):
+def fetch(url, fmt="md", out_dir=None, timeout=600, attachments=None):
     """调用 src/cli.js，返回其 JSON 结果 dict。
 
     成功: {"ok": True, "path": ..., "format": ..., "meta": {...}}
     失败: {"ok": False, "error": ...}
     """
-    if fmt not in ("md", "csv"):
+    if fmt not in FORMATS.values():
         return {"ok": False, "error": f"不支持的格式: {fmt}"}
 
     out_dir = Path(out_dir) if out_dir else ROOT / "output"
     cmd = ["node", str(CLI), url, "--format", fmt, "--out", str(out_dir)]
+
+    if attachments is not None:
+        cmd.extend(["--attachments", json.dumps(attachments)])
 
     try:
         proc = subprocess.run(

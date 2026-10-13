@@ -2,6 +2,7 @@
 import shutil
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -45,7 +46,7 @@ class ApiTest(unittest.TestCase):
         r = client.get("/api/formats")
         self.assertEqual(r.status_code, 200)
         values = {f["value"] for f in r.json()["formats"]}
-        self.assertEqual(values, {"md", "csv"})
+        self.assertEqual(values, {"md", "csv", "pdf"})
 
     def test_config_reports_both_scopes(self):
         r = client.get("/api/config")
@@ -53,6 +54,33 @@ class ApiTest(unittest.TestCase):
         data = r.json()
         self.assertEqual(data["library_dir"], str(self._tmp_library))
         self.assertEqual(data["workspace_dir"], str(OUTPUT_DIR))
+
+    def test_open_inbox_uses_fixed_output_directory(self):
+        with patch("app.service.sys.platform", "darwin"), patch("app.service.subprocess.run") as run:
+            r = client.post("/api/open-inbox")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()["path"], str(storage.WORKSPACE_DIR.resolve()))
+        self.assertEqual(run.call_args.args[0], ["/usr/bin/open", str(storage.WORKSPACE_DIR.resolve())])
+
+    def test_pdf_inline_view_and_finder_reveal(self):
+        pdf = OUTPUT_DIR / "test_inline.pdf"
+        pdf.write_bytes(b"%PDF-1.4\n%%EOF")
+        self.paths.append(pdf)
+        r = client.get("/api/view", params={"id": pdf.name})
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.headers["content-disposition"].startswith("inline"))
+        self.assertEqual(r.headers["content-type"], "application/pdf")
+        with patch("app.service.sys.platform", "darwin"), patch("app.service.subprocess.run") as run:
+            r = client.post("/api/open-inbox", params={"id": pdf.name})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(run.call_args.args[0], ["/usr/bin/open", "-R", str(pdf.resolve())])
+        self.assertEqual(client.post("/api/open-inbox", params={"id": "../README.md"}).status_code, 400)
+
+    def test_open_inbox_failure_is_reported(self):
+        with patch("app.service.sys.platform", "darwin"), patch("app.service.subprocess.run", side_effect=OSError):
+            r = client.post("/api/open-inbox")
+        self.assertEqual(r.status_code, 400)
+        self.assertIn("无法打开 Finder", r.json()["detail"])
 
     def test_files_contains_sample(self):
         r = client.get("/api/files", params={"scope": "workspace"})

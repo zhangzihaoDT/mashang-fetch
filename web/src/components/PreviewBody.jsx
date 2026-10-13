@@ -1,4 +1,6 @@
 import MarkdownPreview from './MarkdownPreview.jsx'
+import { lazy, Suspense } from 'react'
+const PdfPreview = lazy(() => import('./PdfPreview.jsx'))
 
 function DataTable({ header = [], rows = [] }) {
   return (
@@ -27,6 +29,8 @@ function DataTable({ header = [], rows = [] }) {
 
 export default function PreviewBody({ preview }) {
   switch (preview.kind) {
+    case 'pdf':
+      return <Suspense fallback={<p className="muted">加载 PDF…</p>}><PdfPreview key={`${preview.scope}:${preview.id}`} preview={preview} /></Suspense>
     case 'markdown':
       return <MarkdownPreview content={preview.content} />
     case 'table':

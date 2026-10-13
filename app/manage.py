@@ -42,6 +42,13 @@ def rename(scope, file_id, new_name):
     if dst.exists():
         raise ValueError("同名文件已存在")
     src.rename(dst)
+    _move_source(src, dst)
+    sidecar = dst.with_name(f".{dst.name}.source.json")
+    if dst.suffix.lower() == ".pdf" and sidecar.is_file():
+        import json
+        meta = json.loads(sidecar.read_text(encoding="utf-8"))
+        meta["title"] = base
+        sidecar.write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
     return dst
 
 
@@ -51,33 +58,61 @@ def delete(scope, file_id):
     if not path.is_file():
         raise ValueError("文件不存在")
     path.unlink()
+    path.with_name(f".{path.name}.source.json").unlink(missing_ok=True)
     return path
 
 
 def keep(file_id):
-    """把 Inbox 文件移动（转移）到资料库，返回目标路径。
-
-    同名文件已存在时不覆盖、不创建副本，直接报错，源文件保留。
-    """
+    """保留相对目录归档，目标存在时不覆盖，失败时保留源文件。"""
     src = storage.resolve(storage.WORKSPACE, file_id)
     if not src.is_file():
         raise ValueError("文件不存在")
-
-    storage.ensure_library_dir()
-    dst = Path(storage.LIBRARY_DIR) / src.name
-    if dst.exists():
-        raise ValueError(f"资料库已存在同名文件：{dst.name}")
-
-    # 先复制到资料库内的临时文件，确认写入成功后再删除源文件并改名，
-    # 避免任何中途失败导致文件丢失。
-    fd, tmp_name = tempfile.mkstemp(prefix=".keep-", dir=str(storage.LIBRARY_DIR))
-    os.close(fd)
-    tmp = Path(tmp_name)
+    relative = src.relative_to(storage.WORKSPACE_DIR.resolve())
+    dst = storage.resolve(storage.LIBRARY, str(relative))
+    source_meta = src.with_name(f".{src.name}.source.json")
+    target_meta = dst.with_name(f".{dst.name}.source.json")
+    if dst.exists() or target_meta.exists():
+        raise ValueError(f"资料库已存在同名文件：{relative}")
+    tmp = None
+    created = False
+    meta_created = False
     try:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp_name = tempfile.mkstemp(prefix=".keep-", dir=str(dst.parent))
+        os.close(fd)
+        tmp = Path(tmp_name)
         shutil.copy2(src, tmp)
+        # 原子创建目标；并发出现同名文件时也不会覆盖。
+        os.link(tmp, dst)
+        created = True
+        if source_meta.is_file():
+            with target_meta.open("xb") as output:
+                meta_created = True
+                output.write(source_meta.read_bytes())
         src.unlink()
-        os.replace(tmp, dst)
-    except OSError:
-        tmp.unlink(missing_ok=True)
-        raise
+    except OSError as exc:
+        if created:
+            dst.unlink(missing_ok=True)
+        if meta_created:
+            target_meta.unlink(missing_ok=True)
+        raise ValueError(f"移入资料库失败：{relative}（{exc.strerror or str(exc)}）") from exc
+    finally:
+        if tmp:
+            tmp.unlink(missing_ok=True)
+    source_meta.unlink(missing_ok=True)
+    # 只清理本次移动后空出的父目录，Inbox 根目录始终保留。
+    parent = src.parent
+    root = storage.WORKSPACE_DIR.resolve()
+    while parent != root:
+        try:
+            parent.rmdir()
+        except OSError:
+            break
+        parent = parent.parent
     return dst
+
+
+def _move_source(src, dst):
+    sidecar = src.with_name(f".{src.name}.source.json")
+    if sidecar.is_file():
+        shutil.move(str(sidecar), str(dst.with_name(f".{dst.name}.source.json")))

@@ -8,8 +8,9 @@ import Header from './components/Header.jsx'
 import PreviewPane from './components/PreviewPane.jsx'
 
 const FALLBACK_FORMATS = [
-  { label: 'Markdown', value: 'md' },
-  { label: 'CSV', value: 'csv' },
+  { label: '网页正文（Markdown）', value: 'md' },
+  { label: '网页表格（CSV）', value: 'csv' },
+  { label: 'PDF 附件', value: 'pdf' },
 ]
 
 const EMPTY_LISTS = { workspace: [], library: [] }
@@ -19,9 +20,23 @@ export default function App() {
   const [url, setUrl] = useState('')
   const [format, setFormat] = useState('md')
   const [formats, setFormats] = useState(FALLBACK_FORMATS)
+  const [pending, setPending] = useState(null)
+  const [selected, setSelected] = useState([])
   const [scope, setScope] = useState('workspace')
   const [lists, setLists] = useState(EMPTY_LISTS)
   const [dirs, setDirs] = useState({ workspace_dir: '', library_dir: '' })
+  const [openingInbox, setOpeningInbox] = useState(false)
+
+  const openInbox = async (targetScope = scope, id) => {
+    setOpeningInbox(true)
+    try {
+      await api.openInbox(targetScope, id)
+    } catch (err) {
+      dispatch({ type: 'notice', error: err.message })
+    } finally {
+      setOpeningInbox(false)
+    }
+  }
 
   const loadFiles = useCallback(async () => {
     const [workspace, library] = await Promise.all([api.files('workspace'), api.files('library')])
@@ -49,31 +64,39 @@ export default function App() {
     }
   }, [])
 
-  const runFetch = useCallback(async () => {
+  const runFetch = useCallback(async (attachments) => {
     if (!url.trim()) {
       dispatch({ type: 'fetch/error', error: '请先输入 URL' })
       return
     }
     dispatch({ type: 'fetch/start' })
     try {
-      const result = await api.fetchUrl(url.trim(), format)
+      const result = await api.fetchUrl(pending && attachments ? pending.source : url.trim(), attachments ? 'pdf' : format, attachments)
       if (!result.ok) {
         dispatch({ type: 'fetch/error', error: result.error || '转换失败' })
         return
       }
+      if (result.needs_selection) {
+        setPending(result)
+        setSelected(result.attachments.map(item => item.url))
+        dispatch({ type: 'fetch/selection' })
+        return
+      }
+      setPending(null)
+      const pdfFiles = (result.files || [result.file]).filter(file => file.format === 'pdf')
       const next = await loadFiles()
       const preview = await api.preview('workspace', result.file.id)
       setScope('workspace')
       dispatch({
         type: 'fetch/success',
-        message: `已生成 ${result.file.name}`,
+        message: pdfFiles.length ? `已整理 ${pdfFiles.length} 个 PDF 到 Inbox${result.failed?.length ? '；失败：' + result.failed.map(item => item.name + '（' + item.error + '）').join('、') : ''}` : `已生成 ${result.file.name}`,
         files: next.workspace,
         preview,
       })
     } catch (err) {
       dispatch({ type: 'fetch/error', error: err.message })
     }
-  }, [url, format, loadFiles])
+  }, [url, format, pending, loadFiles])
 
   const refresh = useCallback(async () => {
     const next = await loadFiles()
@@ -97,6 +120,7 @@ export default function App() {
         dispatch({ type: 'notice', message: `已移入资料库：${result.file.name}` })
       } catch (err) {
         dispatch({ type: 'notice', error: err.message })
+        throw err
       }
     },
     [loadFiles, selectFile, state.activeScope, state.activeId],
@@ -113,6 +137,7 @@ export default function App() {
         dispatch({ type: 'notice', message: `已重命名为 ${result.file.name}` })
       } catch (err) {
         dispatch({ type: 'notice', error: err.message })
+        throw err
       }
     },
     [loadFiles, selectFile, state.activeScope, state.activeId],
@@ -139,7 +164,7 @@ export default function App() {
     async (targetScope, action, ids) => {
       const result = await api.batch(targetScope, action, ids)
       await loadFiles()
-      if (state.activeScope === targetScope && ids.includes(state.activeId)) {
+      if (state.activeScope === targetScope && result.succeeded.includes(state.activeId)) {
         dispatch({ type: 'preview/clear' })
       }
       const done = result.succeeded.length
@@ -149,7 +174,7 @@ export default function App() {
       } else if (action === 'move_to_library') {
         dispatch({
           type: 'notice',
-          message: `已移入资料库 ${done} 个文件${skipped ? `，跳过 ${skipped} 个同名文件` : ''}`,
+          message: `已移入资料库 ${done} 个文件${skipped ? `，未移入 ${skipped} 个：${result.failed.map(item => item.id + '（' + item.error + '）').join('、')}` : ''}`,
         })
       } else {
         dispatch({ type: 'notice', message: `已删除 ${done} 个文件` })
@@ -165,15 +190,32 @@ export default function App() {
 
       <FetchBar
         url={url}
-        onUrlChange={setUrl}
+        onUrlChange={(value) => { setUrl(value); setPending(null) }}
         format={format}
-        onFormatChange={setFormat}
+        onFormatChange={(value) => { setFormat(value); setPending(null) }}
         formats={formats}
-        onFetch={runFetch}
+        onFetch={() => runFetch()}
         busy={state.status === STATUS.FETCHING}
         message={state.message}
         error={state.error}
       />
+
+      {pending && (
+        <section className="panel" aria-label="PDF 附件选择">
+          <h2>找到 {pending.attachments.length} 个 PDF 附件</h2>
+          {pending.attachments.map(item => (
+            <p key={item.url}>
+              <label><input type="checkbox" checked={selected.includes(item.url)}
+                disabled={state.status === STATUS.FETCHING}
+                onChange={e => setSelected(e.target.checked ? [...selected, item.url] : selected.filter(link => link !== item.url))} /> {item.name}</label>
+              {' '}<a href={item.url} target="_blank" rel="noreferrer">查看原链接</a>
+            </p>
+          ))}
+          <button className="btn primary" disabled={!selected.length || state.status === STATUS.FETCHING} onClick={() => runFetch(selected)}>下载所选（{selected.length}）</button>
+          {' '}<button className="btn" disabled={state.status === STATUS.FETCHING} onClick={() => runFetch(pending.attachments.map(item => item.url))}>全部下载</button>
+          {' '}<button className="btn" disabled={state.status === STATUS.FETCHING} onClick={() => setPending(null)}>取消</button>
+        </section>
+      )}
 
       <div className="workspace">
         <FileSidebar
@@ -183,6 +225,9 @@ export default function App() {
           activeId={state.activeId}
           activeScope={state.activeScope}
           libraryDir={dirs.library_dir}
+          directory={scope === 'workspace' ? dirs.workspace_dir : dirs.library_dir}
+          onOpenFolder={() => openInbox(scope)}
+          openingFolder={openingInbox}
           onSelect={selectFile}
           onRefresh={refresh}
           onKeep={keepFile}
@@ -190,7 +235,9 @@ export default function App() {
           onDelete={deleteFile}
           onBatch={batchFiles}
         />
-        <PreviewPane preview={state.preview} loading={state.previewLoading} />
+        <PreviewPane key={`${state.activeScope}:${state.activeId}`} preview={state.preview} loading={state.previewLoading}
+          onReveal={() => openInbox(state.activeScope, state.activeId)} onKeep={keepFile}
+          onRename={renameFile} onDelete={deleteFile} />
       </div>
     </div>
   )

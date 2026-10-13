@@ -22,14 +22,14 @@ export default function FetchBar({
           className="url-input"
           value={url}
           onChange={(e) => onUrlChange(e.target.value)}
-          placeholder="Paste URL, e.g. https://mp.weixin.qq.com/s/..."
+          placeholder="粘贴网页或附件链接…"
           spellCheck={false}
         />
         <select
           className="format-select"
           value={format}
           onChange={(e) => onFormatChange(e.target.value)}
-          aria-label="Format"
+          aria-label="获取方式"
         >
           {formats.map((f) => (
             <option key={f.value} value={f.value}>
@@ -45,6 +45,7 @@ export default function FetchBar({
       <div className={`status-line${error ? ' error' : ''}`}>
         {error ? `✗ ${error}` : message ? `✓ ${message}` : ''}
       </div>
+
     </div>
   )
 }

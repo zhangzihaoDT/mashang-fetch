@@ -28,6 +28,7 @@ app.add_middleware(
 class FetchRequest(BaseModel):
     url: str
     format: str = "md"
+    attachments: list[str] | None = None
 
 
 class RenameRequest(BaseModel):
@@ -69,8 +70,7 @@ def api_fetch(req: FetchRequest):
     overview = req.url.strip()
     if not overview:
         return {"ok": False, "error": "请先输入 URL"}
-    fmt = req.format if req.format in ("md", "csv") else "md"
-    return service.fetch_url(overview, fmt)
+    return service.fetch_url(overview, req.format, req.attachments)
 
 
 @app.get("/api/preview")
@@ -92,6 +92,20 @@ def api_download(scope: str = Query("workspace"), id: str = Query(...)):
     return FileResponse(str(path), filename=path.name)
 
 
+@app.get("/api/view")
+def api_view(scope: str = Query("workspace"), id: str = Query(...)):
+    try:
+        path = service.resolve_id(scope, id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="文件不存在")
+    if path.suffix.lower() != ".pdf":
+        raise HTTPException(status_code=400, detail="仅支持 PDF 预览")
+    return FileResponse(str(path), media_type="application/pdf", filename=path.name,
+                        content_disposition_type="inline")
+
+
 @app.get("/api/config")
 def api_config():
     return service.config()
@@ -101,6 +115,14 @@ def api_config():
 def api_keep(req: IdRequest):
     try:
         return service.keep(req.id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/api/open-inbox")
+def api_open_inbox(scope: str = Query("workspace"), id: str | None = Query(None)):
+    try:
+        return service.open_inbox(scope, id)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 

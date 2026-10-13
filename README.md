@@ -42,12 +42,12 @@ myknbase Import
 - **Inbox / 资料库**：两个文件空间。Inbox 是 `output/` 暂存区；资料库是长期保存目录（默认 `50_外部资料`）。左侧用标签页切换。
 - **File**：文件资源层。列表、搜索、选中以及 Rename / 移入资料库 / Download / Delete 都归于此；Preview 不承载操作。
 - **Preview**：第一职责是忠实呈现转换结果。`.md` → Markdown 渲染，`.csv` → 表格，`.json` → 格式化，其余 → 文本兜底。
-- **移入资料库**：把 Inbox 文件**移动**到资料库，Inbox 中不再保留；同名时不覆盖、不创建副本，直接提示「已存在」并保留源文件。资料库中的文件不再显示该操作。
+- **移入资料库**：把 Inbox 文件**按原相对目录移动**到资料库，Inbox 中不再保留；同名时不覆盖、不创建副本，直接提示「已存在」并保留源文件。资料库中的文件不再显示该操作。
 - **Rename / Delete / Download**：在两个空间分别生效，互不影响。
 
 ## 主要功能
 
-- **链接转文件**：输入 URL，按域名解析抓取策略，导出 Markdown 或 CSV。
+- **链接转文件**：输入 URL，按域名解析抓取策略，导出 Markdown 或 CSV，或下载链接指向的 PDF 原文件。
 - **结构化输出**：`.md` 带 YAML front matter（title / source / author / fetched_at），文件自描述、可追溯来源。
 - **忠实预览**：按文件类型渲染，不经过任何模型。
 - **双空间管理**：Inbox 暂存、资料库长期保存；两处都支持搜索、Rename、Download、Delete（行内二次确认）。
@@ -105,7 +105,7 @@ npm run up     # 启动（后台运行）
 npm run down   # 停止
 ```
 
-在浏览器打开 `http://127.0.0.1:7860`：输入 URL → 选择 Format → **Fetch** → 自动进入 **Inbox** 并选中新文件预览。
+在浏览器打开 `http://127.0.0.1:7860`：输入 URL → 选择 Format → **Fetch** → 自动进入 **Inbox** 并选中新文件预览。左侧 **打开文件夹** 打开当前 Inbox 或资料库；详情顶部 **在 Finder 中显示** 定位选中的文件（macOS）。目录路径收在「目录信息」中，可查看和复制。
 
 左侧 **Files** 面板顶部可切换两个空间：**Inbox**（暂存）与 **资料库**（长期保存），各自带文件数量与搜索框。点击 **选择** 进入选择模式，文件行出现复选框，顶部工具栏按选中数量显示可用操作：
 
@@ -137,7 +137,7 @@ npm run web:dev  # 另开一个终端跑 Vite（http://127.0.0.1:5173）
 核心引擎也可直接当作 CLI 使用：
 
 ```bash
-node src/cli.js <url> --format md|csv [--out DIR]
+node src/cli.js <url> --format md|csv|pdf [--out DIR]
 ```
 
 成功时 stdout 输出 JSON：
@@ -145,6 +145,16 @@ node src/cli.js <url> --format md|csv [--out DIR]
 ```json
 {"ok":true,"path":"output/20261002_120000_标题.md","format":"md","meta":{"title":"标题","source":"https://..."}}
 ```
+
+### 下载 PDF
+
+界面中选择 **PDF（原文件）**，粘贴 PDF 直链或包含 PDF 附件的网页链接并点击 Fetch。文件保存到 Inbox（`output/`），支持 Rename、Download、Delete 和移入资料库。支持重定向，以及没有 `.pdf` 后缀的下载地址；下载时校验 PDF 文件头，错误页不会保存为 PDF。
+
+```bash
+node src/cli.js https://example.com/report.pdf --format pdf
+```
+
+此功能下载 PDF 原文件，也会查找当前网页中的 PDF 附件链接：单个附件自动下载，多个附件可勾选或全部下载，单个失败不影响其余文件。Fetch 成功后保存文件到 Inbox，不自动下载副本。暂不支持需要 JavaScript 动态加载的附件。来源页面与下载地址保存在隐藏的来源记录中，随文件重命名、移入资料库和删除。右侧通过 PDF.js 直接预览 PDF，支持翻页；详情顶部提供 Finder 定位和移入资料库，「更多」包含重命名、下载副本和删除，来源信息默认折叠。PDF 文件名包含时间、来源文件名和随机后缀，避免重复下载覆盖。
 
 ## 输出文件
 
@@ -218,9 +228,13 @@ npm test    # 运行 API 冒烟测试（unittest + FastAPI TestClient）
 ## v0.1 非目标
 
 - 视频站（B 站等）的专用 Resolver
-- PDF / 图片导出与预览（仅预留分发位）
+- 网页转 PDF、PDF 正文解析、图片导出
 - 微信正文内图片抓取
 
 ## 许可证
 
 本项目采用 MIT 许可证 - 详情请参见 LICENSE 文件
+
+### 保留分类目录归档
+
+`Inbox/规划公示/项目A.pdf` 移入后为 `资料库/规划公示/项目A.pdf`。同名目录合并，完整目标路径同名时跳过并保留源文件；不同目录的同名文件可正常移动。文件夹行的「移入资料库」递归归档其中全部文件（包括未显示的普通文件），失败项保留在 Inbox。PDF 来源记录随文件移动，移动后空出的目录自动清理。

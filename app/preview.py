@@ -5,7 +5,7 @@ from pathlib import Path
 
 from app.storage import OUTPUT_DIR
 
-PREVIEWABLE_EXTS = {".md", ".csv", ".json"}
+PREVIEWABLE_EXTS = {".md", ".csv", ".json", ".pdf"}
 
 
 def list_outputs(out_dir=None):
@@ -13,7 +13,7 @@ def list_outputs(out_dir=None):
     out_dir = Path(out_dir) if out_dir else OUTPUT_DIR
     if not out_dir.exists():
         return []
-    files = [p for p in out_dir.rglob("*") if p.is_file() and p.suffix.lower() in PREVIEWABLE_EXTS]
+    files = [p for p in out_dir.rglob("*") if p.is_file() and not p.name.startswith(".") and p.suffix.lower() in PREVIEWABLE_EXTS]
     files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
     return [(str(p.relative_to(out_dir)), str(p)) for p in files]
 
@@ -62,6 +62,8 @@ def load(path):
         return {"kind": "error", "error": f"文件不存在: {path}"}
 
     ext = p.suffix.lower()
+    if ext == ".pdf":
+        return {"kind": "pdf"}
     if ext == ".md":
         return {"kind": "markdown", "content": p.read_text(encoding="utf-8", errors="ignore")}
     if ext == ".csv":

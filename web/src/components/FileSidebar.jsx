@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { fileIcon, formatTime } from '../utils.js'
+import { fileIcon, formatTime, formatSize } from '../utils.js'
 
 const SCOPES = [
   { value: 'workspace', label: 'Inbox', hint: '抓取结果，待整理' },
@@ -28,6 +28,9 @@ export default function FileSidebar({
   activeId,
   activeScope,
   libraryDir,
+  directory,
+  onOpenFolder,
+  openingFolder,
   onSelect,
   onRefresh,
   onKeep,
@@ -265,7 +268,7 @@ export default function FileSidebar({
               {fileIcon(f.format)} {f.title}
             </span>
             <span className="file-sub">
-              {baseOf(f.id)} · {formatTime(f.mtime)}
+              {f.format.toUpperCase()} · {formatSize(f.size)} · {formatTime(f.mtime)}
             </span>
           </button>
         </div>
@@ -290,6 +293,13 @@ export default function FileSidebar({
         ))}
       </div>
 
+      <div className="space-location">
+        <span className="muted small">{inWorkspace ? '抓取结果，待整理' : '长期保存的资料'}</span>
+        <button className="mini-btn" onClick={onOpenFolder} disabled={openingFolder}>打开文件夹 ↗</button>
+      </div>
+      <details className="directory-info"><summary>目录信息</summary><code>{directory}</code>
+        <button className="mini-btn" onClick={async () => { try { await navigator.clipboard.writeText(directory); setError('') } catch { setError('无法复制，请手动复制路径') } }}>复制路径</button>
+      </details>
       <div className="panel-head">
         <button className="icon-btn" type="button" onClick={onRefresh} title="刷新列表">
           ↻
@@ -334,29 +344,6 @@ export default function FileSidebar({
                   title={libraryDir ? `移入资料库：${libraryDir}` : '移入资料库'}
                 >
                   {busy ? '处理中…' : '移入资料库'}
-                </button>
-              )}
-              <button
-                className="mini-btn"
-                type="button"
-                disabled={busy || !single}
-                onClick={startRename}
-                title={single ? '重命名文件名' : '批量不支持重命名'}
-              >
-                Rename
-              </button>
-              {single ? (
-                <a
-                  className="mini-btn"
-                  href={`/api/download?scope=${encodeURIComponent(scope)}&id=${encodeURIComponent(single.id)}`}
-                  download
-                  title="下载一份"
-                >
-                  ↓ Download
-                </a>
-              ) : (
-                <button className="mini-btn" type="button" disabled title="批量不支持下载">
-                  ↓ Download
                 </button>
               )}
               <button
@@ -430,6 +417,7 @@ export default function FileSidebar({
         </div>
       )}
 
+      {error && !selectMode && <p className="confirm-error" role="alert">{error}</p>}
       <div className="file-list" ref={listRef}>
         {filtered.length === 0 && (
           <p className="muted small">
@@ -445,6 +433,7 @@ export default function FileSidebar({
           const open = filtering || expanded.has(dir)
           return (
             <div className="folder-group" key={dir}>
+              <div className="folder-header-row">
               <button
                 className="folder-head"
                 type="button"
@@ -455,6 +444,9 @@ export default function FileSidebar({
                 <span className="folder-name">{dir}</span>
                 <span className="folder-count">{items.length}</span>
               </button>
+              {inWorkspace && <button className="mini-btn" disabled={busy} title="保留目录结构，移入此文件夹中的全部文件"
+                onClick={async () => { setBusy(true); setError(''); try { await onBatch(scope, 'move_to_library', [dir]) } catch (err) { setError(err.message) } finally { setBusy(false) } }}>移入资料库</button>}
+              </div>
               {open && <div className="folder-children">{items.map(renderFile)}</div>}
             </div>
           )
