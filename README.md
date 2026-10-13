@@ -1,5 +1,9 @@
 # mashang-fetch
 
+**当前版本：v1.0.0** · 基线日期：2026-10-13 · [版本记录](CHANGELOG.md) · [Git 基线标签](https://github.com/zhangzihaoDT/mashang-fetch/tree/v1.0.0)
+
+此标签固定当前已提交的 PDF 获取、预览与目录归档实现，后续版本更新保留该标签。查看基线可使用 `git show v1.0.0`；建议通过独立 worktree 检出，避免影响当前整理中的文件。
+
 获取网页正文、表格与 PDF 附件，保存为本地文件，在 **Inbox → 资料库** 两个空间之间预览、分类、归档。
 
 **链接 → 获取资料 → Inbox → 查看与整理 → 移入资料库**
