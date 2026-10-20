@@ -3,17 +3,24 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' }
 async function parse(res) {
   if (!res.ok) {
     let detail = res.statusText
+    let diagnostics
     try {
-      detail = (await res.json()).detail || detail
+      const body = await res.json()
+      detail = body.detail || detail
+      diagnostics = body.diagnostics
     } catch {
       /* ignore */
     }
-    throw new Error(detail)
+    const error = new Error(detail)
+    error.diagnostics = diagnostics
+    throw error
   }
   return res.json()
 }
 
 export const api = {
+  search: (body) => fetch('/api/search', { method: 'POST', headers: JSON_HEADERS, body: JSON.stringify(body) }).then(parse),
+  importFile: (file) => fetch(`/api/import?name=${encodeURIComponent(file.name)}`, { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: file }).then(parse),
   openInbox: (scope = 'workspace', id) => fetch(`/api/open-inbox?scope=${encodeURIComponent(scope)}${id !== undefined ? '&id=' + encodeURIComponent(id) : ''}`, { method: 'POST' }).then(parse),
   viewUrl: (scope, id) => `/api/view?scope=${encodeURIComponent(scope)}&id=${encodeURIComponent(id)}`,
   config: () => fetch('/api/config').then(parse),

@@ -1,0 +1,304 @@
+{
+  "cases": [
+    {
+      "id": "im",
+      "results": [
+        {
+          "url": "https://noise.example/im/0",
+          "angles": [
+            "发布事件",
+            "产品价格",
+            "技术细节"
+          ]
+        },
+        {
+          "url": "https://noise.example/im/1",
+          "angles": [
+            "发布事件",
+            "产品价格",
+            "技术细节"
+          ]
+        },
+        {
+          "url": "https://noise.example/im/2",
+          "angles": [
+            "发布事件",
+            "产品价格",
+            "技术细节"
+          ]
+        },
+        {
+          "url": "https://noise.example/im/3",
+          "angles": [
+            "发布事件",
+            "产品价格",
+            "技术细节"
+          ]
+        },
+        {
+          "url": "https://news.example/im/0",
+          "angles": [
+            "发布事件"
+          ]
+        },
+        {
+          "url": "https://news.example/im/1",
+          "angles": [
+            "产品价格"
+          ]
+        },
+        {
+          "url": "https://news.example/im/2",
+          "angles": [
+            "技术细节"
+          ]
+        },
+        {
+          "url": "https://news.example/im/3",
+          "angles": [
+            "发布事件"
+          ]
+        },
+        {
+          "url": "https://news.example/im/4",
+          "angles": [
+            "产品价格"
+          ]
+        },
+        {
+          "url": "https://news.example/im/5",
+          "angles": [
+            "技术细节"
+          ]
+        },
+        {
+          "url": "https://news.example/im/6",
+          "angles": [
+            "发布事件"
+          ]
+        },
+        {
+          "url": "https://news.example/im/7",
+          "angles": [
+            "产品价格"
+          ]
+        }
+      ],
+      "requests": 3
+    },
+    {
+      "id": "tesla",
+      "results": [
+        {
+          "url": "https://noise.example/tesla/0",
+          "angles": [
+            "运营进展",
+            "监管许可",
+            "产品技术"
+          ]
+        },
+        {
+          "url": "https://noise.example/tesla/1",
+          "angles": [
+            "运营进展",
+            "监管许可",
+            "产品技术"
+          ]
+        },
+        {
+          "url": "https://noise.example/tesla/2",
+          "angles": [
+            "运营进展",
+            "监管许可",
+            "产品技术"
+          ]
+        },
+        {
+          "url": "https://noise.example/tesla/3",
+          "angles": [
+            "运营进展",
+            "监管许可",
+            "产品技术"
+          ]
+        },
+        {
+          "url": "https://news.example/tesla/0",
+          "angles": [
+            "运营进展"
+          ]
+        },
+        {
+          "url": "https://news.example/tesla/1",
+          "angles": [
+            "监管许可"
+          ]
+        },
+        {
+          "url": "https://news.example/tesla/2",
+          "angles": [
+            "产品技术"
+          ]
+        },
+        {
+          "url": "https://news.example/tesla/3",
+          "angles": [
+            "运营进展"
+          ]
+        },
+        {
+          "url": "https://news.example/tesla/4",
+          "angles": [
+            "监管许可"
+          ]
+        },
+        {
+          "url": "https://news.example/tesla/5",
+          "angles": [
+            "产品技术"
+          ]
+        },
+        {
+          "url": "https://news.example/tesla/6",
+          "angles": [
+            "运营进展"
+          ]
+        },
+        {
+          "url": "https://news.example/tesla/7",
+          "angles": [
+            "运营进展"
+          ]
+        }
+      ],
+      "requests": 3
+    },
+    {
+      "id": "deepseek",
+      "results": [
+        {
+          "url": "https://noise.example/deepseek/0",
+          "angles": [
+            "发布进展",
+            "技术能力",
+            "使用价格"
+          ]
+        },
+        {
+          "url": "https://noise.example/deepseek/1",
+          "angles": [
+            "发布进展",
+            "技术能力",
+            "使用价格"
+          ]
+        },
+        {
+          "url": "https://noise.example/deepseek/2",
+          "angles": [
+            "发布进展",
+            "技术能力",
+            "使用价格"
+          ]
+        },
+        {
+          "url": "https://noise.example/deepseek/3",
+          "angles": [
+            "发布进展",
+            "技术能力",
+            "使用价格"
+          ]
+        },
+        {
+          "url": "https://news.example/deepseek/0",
+          "angles": [
+            "发布进展"
+          ]
+        },
+        {
+          "url": "https://news.example/deepseek/1",
+          "angles": [
+            "技术能力"
+          ]
+        },
+        {
+          "url": "https://news.example/deepseek/2",
+          "angles": [
+            "使用价格"
+          ]
+        },
+        {
+          "url": "https://news.example/deepseek/3",
+          "angles": [
+            "发布进展"
+          ]
+        },
+        {
+          "url": "https://news.example/deepseek/4",
+          "angles": [
+            "技术能力"
+          ]
+        },
+        {
+          "url": "https://news.example/deepseek/5",
+          "angles": [
+            "使用价格"
+          ]
+        },
+        {
+          "url": "https://news.example/deepseek/6",
+          "angles": [
+            "发布进展"
+          ]
+        },
+        {
+          "url": "https://news.example/deepseek/7",
+          "angles": [
+            "技术能力"
+          ]
+        }
+      ],
+      "requests": 3
+    }
+  ],
+  "time": [
+    {
+      "query": "2027款智己LS6配置",
+      "error": true
+    },
+    {
+      "query": "2026年10月 智己汽车",
+      "start": "2026-01-01",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "2026年9月至10月 Tesla",
+      "start": "2026-01-01",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "昨天和今天的发布",
+      "start": "2026-10-19",
+      "end": "2026-10-19"
+    },
+    {
+      "query": "智己汽车 昨日发布",
+      "start": "2026-10-19",
+      "end": "2026-10-19"
+    },
+    {
+      "query": "最近7天 AI",
+      "start": "2026-10-14",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "2026年1月至3月 Tesla",
+      "start": "2026-01-01",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "2026年9月30日至10月2日 新闻",
+      "start": "2026-09-30",
+      "end": "2026-09-30"
+    }
+  ],
+  "provenance": "Frozen replay of the pre-V1 execute/resolve code before implementation; candidate order and labels are in search_quality_v1.json; retain rank order and emitted angles only."
+}

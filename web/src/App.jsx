@@ -2,6 +2,7 @@ import { useCallback, useEffect, useReducer, useState } from 'react'
 
 import { api } from './api.js'
 import { initialState, reducer, STATUS } from './state.js'
+import SearchWorkspace from './components/SearchWorkspace.jsx'
 import FetchBar from './components/FetchBar.jsx'
 import FileSidebar from './components/FileSidebar.jsx'
 import Header from './components/Header.jsx'
@@ -17,6 +18,10 @@ const EMPTY_LISTS = { workspace: [], library: [] }
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState)
+  const [entry, setEntry] = useState('search')
+  const [view, setView] = useState('search')
+  const [importing, setImporting] = useState(false)
+  const [importMessage, setImportMessage] = useState('')
   const [url, setUrl] = useState('')
   const [format, setFormat] = useState('md')
   const [formats, setFormats] = useState(FALLBACK_FORMATS)
@@ -184,10 +189,34 @@ export default function App() {
     [loadFiles, state.activeScope, state.activeId],
   )
 
+  async function importFiles(event) {
+    const files = Array.from(event.target.files || [])
+    event.target.value = ''
+    setImporting(true)
+    const messages = []
+    try {
+      for (const file of files) {
+        try {
+          if (file.size > 25 * 1024 * 1024) throw new Error('文件不得超过 25 MB')
+          const result = await api.importFile(file)
+          messages.push(`${file.name}：已保存`)
+          await loadFiles()
+          await selectFile('workspace', result.file.id)
+          setScope('workspace')
+        } catch (err) { messages.push(`${file.name}：${err.message}`) }
+        setImportMessage(messages.join('；'))
+      }
+    } finally { setImporting(false) }
+  }
+
   return (
     <div className="app">
       <Header />
 
+      <nav className="entry-tabs" aria-label="资料入口">
+        {[['search', '搜索资料'], ['link', '添加链接'], ['upload', '上传文件']].map(([id, label]) => <button key={id} aria-pressed={entry === id} onClick={() => { setEntry(id); setView(id === 'search' ? 'search' : 'saved') }}>{label}</button>)}
+      </nav>
+      <div hidden={entry !== 'link'}>
       <FetchBar
         url={url}
         onUrlChange={(value) => { setUrl(value); setPending(null) }}
@@ -200,7 +229,19 @@ export default function App() {
         error={state.error}
       />
 
-      {pending && (
+      </div>
+      {entry === 'upload' && <section className="panel upload-panel">
+        <h2>导入本地资料</h2><p className="muted">PDF、Markdown、CSV、TXT、JSON · 每个文件最多 25 MB · 文本使用 UTF-8 编码</p>
+        <label className="upload-label">{importing ? '正在导入…' : '选择文件（支持多选）'}<input aria-label="选择上传文件" type="file" multiple accept=".pdf,.md,.csv,.txt,.json" disabled={importing} onChange={importFiles} /></label>
+        <p>文件保存到 Inbox，可直接阅读和移入资料库。PDF 保留原文件，暂不提取正文。</p>
+        <p role="status">{importMessage}</p>
+      </section>}
+      <nav className="view-tabs" aria-label="资料视图">
+        {entry === 'search' && <button aria-pressed={view === 'search'} onClick={() => setView('search')}>搜索结果</button>}
+        <button aria-pressed={view === 'saved'} onClick={() => setView('saved')}>已保存资料 · {lists.workspace.length + lists.library.length}</button>
+      </nav>
+      <div hidden={entry !== 'search' || view !== 'search'}><SearchWorkspace onSaved={loadFiles} /></div>
+      {entry === 'link' && pending && (
         <section className="panel" aria-label="PDF 附件选择">
           <h2>找到 {pending.attachments.length} 个 PDF 附件</h2>
           {pending.attachments.map(item => (
@@ -217,7 +258,7 @@ export default function App() {
         </section>
       )}
 
-      <div className="workspace">
+      <div className="workspace" hidden={view !== 'saved'}>
         <FileSidebar
           scope={scope}
           onScopeChange={setScope}

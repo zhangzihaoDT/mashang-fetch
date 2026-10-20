@@ -49,7 +49,7 @@ export function reducer(state, action) {
       }
 
     case 'fetch/start':
-      return { ...state, status: STATUS.FETCHING, message: 'Fetching…', error: '' }
+      return { ...state, status: STATUS.FETCHING, message: '正在获取资料…', error: '' }
 
     case 'fetch/selection':
       return { ...state, status: STATUS.READY, message: '请选择要下载的 PDF 附件', error: '' }
@@ -68,6 +68,7 @@ export function reducer(state, action) {
         error: '',
         files: action.files,
         activeId: action.preview.id,
+        activeScope: action.preview.scope,
         preview: action.preview,
         previewLoading: false,
       }

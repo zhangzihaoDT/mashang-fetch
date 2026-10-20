@@ -38,7 +38,7 @@ export default function FetchBar({
           ))}
         </select>
         <button className="btn primary" type="submit" disabled={busy}>
-          {busy ? 'Fetching…' : 'Fetch'}
+          {busy ? '获取中…' : '获取资料'}
         </button>
       </form>
 

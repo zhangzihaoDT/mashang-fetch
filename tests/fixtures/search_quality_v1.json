@@ -1,0 +1,701 @@
+{
+  "description": "Hand-authored synthetic replay candidates and labels; not live SERP or independent human evaluation. Fixed reference 2026-10-20. Each topic has 8 relevant and 4 distractors.",
+  "cases": [
+    {
+      "id": "im",
+      "query": "智己汽车 昨日发布",
+      "entries": [
+        {
+          "angle": "发布事件",
+          "query": "智己汽车 昨日发布 发布事件",
+          "purpose": "发布事件",
+          "domains": []
+        },
+        {
+          "angle": "产品价格",
+          "query": "智己汽车 昨日发布 产品价格",
+          "purpose": "产品价格",
+          "domains": []
+        },
+        {
+          "angle": "技术细节",
+          "query": "智己汽车 昨日发布 技术细节",
+          "purpose": "技术细节",
+          "domains": []
+        }
+      ],
+      "rows": [
+        {
+          "id": "im-n0",
+          "url": "https://noise.example/im/0",
+          "title": "智己汽车二手车出售",
+          "snippet": "二手车报价与库存",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "发布事件",
+            "产品价格",
+            "技术细节"
+          ]
+        },
+        {
+          "id": "im-n1",
+          "url": "https://noise.example/im/1",
+          "title": "智己汽车经销商促销",
+          "snippet": "购车优惠广告",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "发布事件",
+            "产品价格",
+            "技术细节"
+          ]
+        },
+        {
+          "id": "im-n2",
+          "url": "https://noise.example/im/2",
+          "title": "汽车之家主页",
+          "snippet": "全国汽车资讯",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "发布事件",
+            "产品价格",
+            "技术细节"
+          ]
+        },
+        {
+          "id": "im-n3",
+          "url": "https://noise.example/im/3",
+          "title": "智己汽车限时优惠",
+          "snippet": "门店促销活动",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "发布事件",
+            "产品价格",
+            "技术细节"
+          ]
+        },
+        {
+          "id": "im-r0",
+          "url": "https://news.example/im/0",
+          "title": "智己汽车发布新车型",
+          "snippet": "新车正式发布，上市时间已公布。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "发布事件"
+          ],
+          "returned_for": [
+            "发布事件"
+          ]
+        },
+        {
+          "id": "im-r1",
+          "url": "https://news.example/im/1",
+          "title": "智己汽车新车售价公布",
+          "snippet": "售价23万元，提供三种配置。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "产品价格"
+          ],
+          "returned_for": [
+            "产品价格"
+          ]
+        },
+        {
+          "id": "im-r2",
+          "url": "https://news.example/im/2",
+          "title": "智己汽车底盘技术解析",
+          "snippet": "采用线控底盘，支持后轮转向。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "技术细节"
+          ],
+          "returned_for": [
+            "技术细节"
+          ]
+        },
+        {
+          "id": "im-r3",
+          "url": "https://news.example/im/3",
+          "title": "智己汽车发布会实录",
+          "snippet": "发布会介绍新车上市计划。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "发布事件"
+          ],
+          "returned_for": [
+            "发布事件"
+          ]
+        },
+        {
+          "id": "im-r4",
+          "url": "https://news.example/im/4",
+          "title": "智己汽车配置及价格表",
+          "snippet": "售价与选装配置详细说明。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "产品价格"
+          ],
+          "returned_for": [
+            "产品价格"
+          ]
+        },
+        {
+          "id": "im-r5",
+          "url": "https://news.example/im/5",
+          "title": "智己汽车电池技术详解",
+          "snippet": "电池容量与续航技术说明。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "技术细节"
+          ],
+          "returned_for": [
+            "技术细节"
+          ]
+        },
+        {
+          "id": "im-r6",
+          "url": "https://news.example/im/6",
+          "title": "智己汽车上市公告",
+          "snippet": "新车发布与交付安排。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "发布事件"
+          ],
+          "returned_for": [
+            "发布事件"
+          ]
+        },
+        {
+          "id": "im-r7",
+          "url": "https://news.example/im/7",
+          "title": "智己汽车新车起售价",
+          "snippet": "价格区间和订购权益。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "产品价格"
+          ],
+          "returned_for": [
+            "产品价格"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tesla",
+      "query": "Tesla Robotaxi 商业化进展",
+      "entries": [
+        {
+          "angle": "运营进展",
+          "query": "Tesla Robotaxi 商业化进展 运营进展",
+          "purpose": "运营进展",
+          "domains": []
+        },
+        {
+          "angle": "监管许可",
+          "query": "Tesla Robotaxi 商业化进展 监管许可",
+          "purpose": "监管许可",
+          "domains": []
+        },
+        {
+          "angle": "产品技术",
+          "query": "Tesla Robotaxi 商业化进展 产品技术",
+          "purpose": "产品技术",
+          "domains": []
+        }
+      ],
+      "rows": [
+        {
+          "id": "tesla-n0",
+          "url": "https://noise.example/tesla/0",
+          "title": "Tesla stock market outlook",
+          "snippet": "Share price prediction",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "运营进展",
+            "监管许可",
+            "产品技术"
+          ]
+        },
+        {
+          "id": "tesla-n1",
+          "url": "https://noise.example/tesla/1",
+          "title": "Tesla Model Y for sale",
+          "snippet": "Used car inventory",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "运营进展",
+            "监管许可",
+            "产品技术"
+          ]
+        },
+        {
+          "id": "tesla-n2",
+          "url": "https://noise.example/tesla/2",
+          "title": "Waymo robotaxi sensors",
+          "snippet": "Waymo autonomous technology",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "运营进展",
+            "监管许可",
+            "产品技术"
+          ]
+        },
+        {
+          "id": "tesla-n3",
+          "url": "https://noise.example/tesla/3",
+          "title": "Tesla accessories shop",
+          "snippet": "Buy vehicle accessories",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "运营进展",
+            "监管许可",
+            "产品技术"
+          ]
+        },
+        {
+          "id": "tesla-r0",
+          "url": "https://news.example/tesla/0",
+          "title": "Tesla Robotaxi commercial service launches",
+          "snippet": "Robotaxi passenger service begins paid operation.",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "运营进展"
+          ],
+          "returned_for": [
+            "运营进展"
+          ]
+        },
+        {
+          "id": "tesla-r1",
+          "url": "https://news.example/tesla/1",
+          "title": "Tesla Robotaxi receives regulator permit",
+          "snippet": "Regulator approves a permit for robotaxi operation.",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "监管许可"
+          ],
+          "returned_for": [
+            "监管许可"
+          ]
+        },
+        {
+          "id": "tesla-r2",
+          "url": "https://news.example/tesla/2",
+          "title": "Tesla Robotaxi autonomous driving technology",
+          "snippet": "Autonomous sensors and vehicle safety system explained.",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "产品技术"
+          ],
+          "returned_for": [
+            "产品技术"
+          ]
+        },
+        {
+          "id": "tesla-r3",
+          "url": "https://news.example/tesla/3",
+          "title": "Tesla Robotaxi fleet expansion",
+          "snippet": "Commercial service adds a new operating area.",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "运营进展"
+          ],
+          "returned_for": [
+            "运营进展"
+          ]
+        },
+        {
+          "id": "tesla-r4",
+          "url": "https://news.example/tesla/4",
+          "title": "Tesla Robotaxi license application",
+          "snippet": "Authority reviews license and regulatory approval.",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "监管许可"
+          ],
+          "returned_for": [
+            "监管许可"
+          ]
+        },
+        {
+          "id": "tesla-r5",
+          "url": "https://news.example/tesla/5",
+          "title": "Tesla Robotaxi vehicle technical details",
+          "snippet": "Sensors and autonomous driving system architecture.",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "产品技术"
+          ],
+          "returned_for": [
+            "产品技术"
+          ]
+        },
+        {
+          "id": "tesla-r6",
+          "url": "https://news.example/tesla/6",
+          "title": "Tesla Robotaxi starts paid rides",
+          "snippet": "Passenger operations and commercial service schedule.",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "运营进展"
+          ],
+          "returned_for": [
+            "运营进展"
+          ]
+        },
+        {
+          "id": "tesla-r7",
+          "url": "https://news.example/tesla/7",
+          "title": "Tesla Robotaxi operating zones expand",
+          "snippet": "Fleet service adds another city.",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "运营进展"
+          ],
+          "returned_for": [
+            "运营进展"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deepseek",
+      "query": "DeepSeek 模型发布",
+      "entries": [
+        {
+          "angle": "发布进展",
+          "query": "DeepSeek 模型发布 发布进展",
+          "purpose": "发布进展",
+          "domains": []
+        },
+        {
+          "angle": "技术能力",
+          "query": "DeepSeek 模型发布 技术能力",
+          "purpose": "技术能力",
+          "domains": []
+        },
+        {
+          "angle": "使用价格",
+          "query": "DeepSeek 模型发布 使用价格",
+          "purpose": "使用价格",
+          "domains": []
+        }
+      ],
+      "rows": [
+        {
+          "id": "deepseek-n0",
+          "url": "https://noise.example/deepseek/0",
+          "title": "DeepSeek 同名股票推荐",
+          "snippet": "股市行情预测",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "发布进展",
+            "技术能力",
+            "使用价格"
+          ]
+        },
+        {
+          "id": "deepseek-n1",
+          "url": "https://noise.example/deepseek/1",
+          "title": "AI工具导航首页",
+          "snippet": "工具合集",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "发布进展",
+            "技术能力",
+            "使用价格"
+          ]
+        },
+        {
+          "id": "deepseek-n2",
+          "url": "https://noise.example/deepseek/2",
+          "title": "DeepSeek 代充值广告",
+          "snippet": "低价账号出售",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "发布进展",
+            "技术能力",
+            "使用价格"
+          ]
+        },
+        {
+          "id": "deepseek-n3",
+          "url": "https://noise.example/deepseek/3",
+          "title": "其他公司模型发布",
+          "snippet": "模型更新",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 0.7,
+          "provider_authority": 0,
+          "relevant": false,
+          "gold_angles": [],
+          "returned_for": [
+            "发布进展",
+            "技术能力",
+            "使用价格"
+          ]
+        },
+        {
+          "id": "deepseek-r0",
+          "url": "https://news.example/deepseek/0",
+          "title": "DeepSeek 新模型发布公告",
+          "snippet": "新模型正式发布并开放使用。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "发布进展"
+          ],
+          "returned_for": [
+            "发布进展"
+          ]
+        },
+        {
+          "id": "deepseek-r1",
+          "url": "https://news.example/deepseek/1",
+          "title": "DeepSeek 模型推理技术",
+          "snippet": "模型架构与推理能力介绍。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "技术能力"
+          ],
+          "returned_for": [
+            "技术能力"
+          ]
+        },
+        {
+          "id": "deepseek-r2",
+          "url": "https://news.example/deepseek/2",
+          "title": "DeepSeek API 模型价格",
+          "snippet": "输入输出token价格与计费说明。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "使用价格"
+          ],
+          "returned_for": [
+            "使用价格"
+          ]
+        },
+        {
+          "id": "deepseek-r3",
+          "url": "https://news.example/deepseek/3",
+          "title": "DeepSeek 新版本上线",
+          "snippet": "新模型开放API访问。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "发布进展"
+          ],
+          "returned_for": [
+            "发布进展"
+          ]
+        },
+        {
+          "id": "deepseek-r4",
+          "url": "https://news.example/deepseek/4",
+          "title": "DeepSeek 模型架构介绍",
+          "snippet": "模型训练与推理技术说明。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "技术能力"
+          ],
+          "returned_for": [
+            "技术能力"
+          ]
+        },
+        {
+          "id": "deepseek-r5",
+          "url": "https://news.example/deepseek/5",
+          "title": "DeepSeek 模型费用说明",
+          "snippet": "API计费与价格调整。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "使用价格"
+          ],
+          "returned_for": [
+            "使用价格"
+          ]
+        },
+        {
+          "id": "deepseek-r6",
+          "url": "https://news.example/deepseek/6",
+          "title": "DeepSeek 模型更新日志",
+          "snippet": "新模型发布与版本更新。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "发布进展"
+          ],
+          "returned_for": [
+            "发布进展"
+          ]
+        },
+        {
+          "id": "deepseek-r7",
+          "url": "https://news.example/deepseek/7",
+          "title": "DeepSeek 模型性能说明",
+          "snippet": "推理能力与技术架构。",
+          "date": "2026-10-19T04:00:00Z",
+          "provider_score": 2.1,
+          "provider_authority": 3,
+          "relevant": true,
+          "gold_angles": [
+            "技术能力"
+          ],
+          "returned_for": [
+            "技术能力"
+          ]
+        }
+      ]
+    }
+  ],
+  "time_cases": [
+    [
+      "2027款智己LS6配置",
+      null,
+      null
+    ],
+    [
+      "2026年10月 智己汽车",
+      "2026-10-01",
+      "2026-10-31"
+    ],
+    [
+      "2026年9月至10月 Tesla",
+      "2026-09-01",
+      "2026-10-31"
+    ],
+    [
+      "昨天和今天的发布",
+      "2026-10-19",
+      "2026-10-20"
+    ],
+    [
+      "智己汽车 昨日发布",
+      "2026-10-19",
+      "2026-10-19"
+    ],
+    [
+      "最近7天 AI",
+      "2026-10-14",
+      "2026-10-20"
+    ],
+    [
+      "2026年1月至3月 Tesla",
+      "2026-01-01",
+      "2026-03-31"
+    ],
+    [
+      "2026年9月30日至10月2日 新闻",
+      "2026-09-30",
+      "2026-10-02"
+    ]
+  ]
+}

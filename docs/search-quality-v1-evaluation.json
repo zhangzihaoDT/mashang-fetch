@@ -1,0 +1,158 @@
+{
+  "method": "synthetic fixed candidate replay; not a live retrieval benchmark; P@10 denominator is always 10; angle precision over all returned labels; expected labels=24; date reference=2026-10-20",
+  "before": {
+    "precision_at_10": 0.6,
+    "time_correct": 2,
+    "time_total": 8,
+    "time_accuracy": 0.25,
+    "angle_precision": 0.4,
+    "angle_correct": 24,
+    "angle_total": 60,
+    "angle_recall": 1.0,
+    "cases": [
+      {
+        "id": "im",
+        "precision_at_10": 0.6,
+        "returned": 12,
+        "label_correct": 8,
+        "labels": 20,
+        "requests": 3
+      },
+      {
+        "id": "tesla",
+        "precision_at_10": 0.6,
+        "returned": 12,
+        "label_correct": 8,
+        "labels": 20,
+        "requests": 3
+      },
+      {
+        "id": "deepseek",
+        "precision_at_10": 0.6,
+        "returned": 12,
+        "label_correct": 8,
+        "labels": 20,
+        "requests": 3
+      }
+    ]
+  },
+  "after": {
+    "precision_at_10": 0.8000000000000002,
+    "time_correct": 8,
+    "time_total": 8,
+    "time_accuracy": 1.0,
+    "angle_precision": 1.0,
+    "angle_correct": 24,
+    "angle_total": 24,
+    "angle_recall": 1.0,
+    "cases": [
+      {
+        "id": "im",
+        "precision_at_10": 0.8,
+        "returned": 8,
+        "label_correct": 8,
+        "labels": 8,
+        "requests": 3
+      },
+      {
+        "id": "tesla",
+        "precision_at_10": 0.8,
+        "returned": 8,
+        "label_correct": 8,
+        "labels": 8,
+        "requests": 3
+      },
+      {
+        "id": "deepseek",
+        "precision_at_10": 0.8,
+        "returned": 8,
+        "label_correct": 8,
+        "labels": 8,
+        "requests": 3
+      }
+    ]
+  },
+  "time_before": [
+    {
+      "query": "2027款智己LS6配置",
+      "error": true
+    },
+    {
+      "query": "2026年10月 智己汽车",
+      "start": "2026-01-01",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "2026年9月至10月 Tesla",
+      "start": "2026-01-01",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "昨天和今天的发布",
+      "start": "2026-10-19",
+      "end": "2026-10-19"
+    },
+    {
+      "query": "智己汽车 昨日发布",
+      "start": "2026-10-19",
+      "end": "2026-10-19"
+    },
+    {
+      "query": "最近7天 AI",
+      "start": "2026-10-14",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "2026年1月至3月 Tesla",
+      "start": "2026-01-01",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "2026年9月30日至10月2日 新闻",
+      "start": "2026-09-30",
+      "end": "2026-09-30"
+    }
+  ],
+  "time_after": [
+    {
+      "query": "2027款智己LS6配置",
+      "start": null,
+      "end": null
+    },
+    {
+      "query": "2026年10月 智己汽车",
+      "start": "2026-10-01",
+      "end": "2026-10-31"
+    },
+    {
+      "query": "2026年9月至10月 Tesla",
+      "start": "2026-09-01",
+      "end": "2026-10-31"
+    },
+    {
+      "query": "昨天和今天的发布",
+      "start": "2026-10-19",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "智己汽车 昨日发布",
+      "start": "2026-10-19",
+      "end": "2026-10-19"
+    },
+    {
+      "query": "最近7天 AI",
+      "start": "2026-10-14",
+      "end": "2026-10-20"
+    },
+    {
+      "query": "2026年1月至3月 Tesla",
+      "start": "2026-01-01",
+      "end": "2026-03-31"
+    },
+    {
+      "query": "2026年9月30日至10月2日 新闻",
+      "start": "2026-09-30",
+      "end": "2026-10-02"
+    }
+  ]
+}
