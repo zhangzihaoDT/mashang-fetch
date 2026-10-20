@@ -22,7 +22,7 @@ mashang-fetch 的成功标准只有一个：**资料有没有被正确获取并�
                               ├─ Preview            只读展示
                               ├─ Rename / Download / Delete
                               └─ 移入资料库 ──移动──▶ 资料库
-                                                      （50_外部资料 / myknbase 导入源）
+                                                      （library / mashang-knbase 默认导入来源）
 ```
 
 ```
@@ -38,13 +38,13 @@ Inbox（output/）        ← 暂存区，抓取结果先落在这里
     ├─ Download         下载一份到本地
     └─ 移入资料库        移动到资料库
         ↓
-资料库（50_外部资料）    ← 长期保存，可直接浏览 / 搜索 / 改名 / 删除 / 下载
+资料库（library）    ← 长期保存，可直接浏览 / 搜索 / 改名 / 删除 / 下载
     ↓
-myknbase Import
+mashang-knbase Import
 ```
 
 - **Fetch / Convert**：能力集中在外部资源的获取与解析，输出可追溯的本地文件。
-- **Inbox / 资料库**：两个文件空间。Inbox 是 `output/` 暂存区；资料库是长期保存目录（默认 `50_外部资料`）。左侧用标签页切换。
+- **Inbox / 资料库**：两个文件空间。Inbox 是 `output/` 暂存区；资料库是长期保存目录（默认项目内 `library/`）。左侧用标签页切换。
 - **File**：文件资源层。列表、搜索、选中以及 Rename / 移入资料库 / Download / Delete 都归于此。单文件操作在右侧详情顶部，批量操作在左侧选择工具栏。
 - **Preview**：第一职责是忠实呈现转换结果。`.md` → Markdown 渲染，`.csv` → 表格，`.json` → 格式化，`.pdf` → PDF.js 原文件预览（支持翻页）。
 - **移入资料库**：把 Inbox 文件**按原相对目录移动**到资料库，Inbox 中不再保留；同名时不覆盖、不创建副本，直接提示「已存在」并保留源文件。资料库中的文件不再显示该操作。
@@ -57,7 +57,7 @@ myknbase Import
 - **忠实预览**：按文件类型渲染，不经过任何模型。
 - **双空间管理**：Inbox 暂存、资料库长期保存；两处都支持搜索、Rename、Download、Delete（删除前确认）。
 - **批量操作**：勾选多个文件后可**批量移入资料库**（Inbox）与**批量删除**；支持全选当前列表或搜索结果。移入时同名文件跳过并保留源文件，其余正常移动。
-- **长期保存**：一键把 Inbox 文件移入资料库，作为 myknbase 的导入来源。
+- **长期保存**：一键把 Inbox 文件移入资料库，作为 mashang-knbase 的导入来源。
 
 ## 技术架构
 
@@ -123,7 +123,7 @@ Fetch 成功后资料已保存到项目的 `output/`，不会自动在浏览器�
 
 - 后台运行时 PID 与日志统一放在 `.local/`（`app.pid`、`app.log`）。
 - 可用 `HOST` / `PORT` 覆盖服务的地址与端口，例如 `PORT=7861 npm run up`。
-- **资料库目录**：默认 `~/Documents/github/notes/50_外部资料`，可用环境变量 `MASHANG_FETCH_KEEP_DIR` 覆盖（例如指向 myknbase 的导入目录）：
+- **资料库目录**：默认 `~/Documents/github/mashang-fetch/library`，可用环境变量 `MASHANG_FETCH_KEEP_DIR` 覆盖（例如指向 mashang-knbase 的导入目录）：
 
 ```bash
 MASHANG_FETCH_KEEP_DIR=/path/to/library npm run up

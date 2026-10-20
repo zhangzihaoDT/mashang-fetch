@@ -18,7 +18,7 @@
                          ↓
             查看 / 分类 / 重命名 / 归档
                          ↓
-       资料库（保留相对路径，供 myknbase 导入）
+       资料库（保留相对路径，供 mashang-knbase 导入）
 ```
 
 PDF 获取不依赖模型，不改写原文件；不将普通网页转换为 PDF。当前附件发现限于普通 HTML 链接，动态加载附件暂未支持。
@@ -44,4 +44,4 @@ PDF 获取不依赖模型，不改写原文件；不将普通网页转换为 PDF
 
 Markdown 使用 YAML front matter 保存来源；PDF 使用同目录隐藏的 `.{PDF文件名}.source.json` 保存资料名称、来源页面、实际下载地址和获取时间。来源记录随 PDF 移动、重命名和删除。
 
-Inbox 为项目 `output/`；资料库默认为 `~/Documents/github/notes/50_外部资料`，可通过 `MASHANG_FETCH_KEEP_DIR` 配置。详细安装、命令行及 API 说明见 [README](README.md)。
+Inbox 为项目 `output/`；资料库默认为 `~/Documents/github/mashang-fetch/library`，可通过 `MASHANG_FETCH_KEEP_DIR` 配置。详细安装、命令行及 API 说明见 [README](README.md)。

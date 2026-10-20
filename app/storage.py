@@ -1,8 +1,8 @@
 """路径配置：两个文件空间。
 
 - workspace（Inbox）：项目内 output/，抓取结果先落在这里，是暂存工作区。
-- library（资料库）：长期保存目录，默认 ~/Documents/github/notes/50_外部资料，
-  是 myknbase 的导入源。
+- library（资料库）：长期保存目录，默认 项目内 library/，
+  作为 mashang-knbase 的默认导入来源。
 
 所有文件操作都必须携带 scope，避免两个空间存在同名文件时产生歧义。
 """
@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 WORKSPACE_DIR = ROOT / "output"
 OUTPUT_DIR = WORKSPACE_DIR  # 兼容旧引用
 
-DEFAULT_LIBRARY_DIR = Path.home() / "Documents" / "github" / "notes" / "50_外部资料"
+DEFAULT_LIBRARY_DIR = ROOT / "library"
 LIBRARY_DIR = Path(
     os.environ.get("MASHANG_FETCH_KEEP_DIR", str(DEFAULT_LIBRARY_DIR))
 ).expanduser()

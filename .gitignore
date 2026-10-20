@@ -52,3 +52,6 @@ output/*
 
 # 前端构建产物
 web/dist/
+
+# 本地资料库
+/library/
