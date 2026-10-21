@@ -24,6 +24,7 @@ function stemOf(name) {
 export default function FileSidebar({
   scope,
   onScopeChange,
+  onBackToResults,
   lists,
   activeId,
   activeScope,
@@ -294,7 +295,10 @@ export default function FileSidebar({
       </div>
 
       <div className="space-location">
-        <span className="muted small">{inWorkspace ? '抓取结果，待整理' : '长期保存的资料'}</span>
+        <div className="space-location-left">
+          {onBackToResults && <button className="mini-btn" type="button" onClick={onBackToResults}>← 搜索结果</button>}
+          <span className="muted small">{inWorkspace ? '抓取结果，待整理' : '长期保存的资料'}</span>
+        </div>
         <button className="mini-btn" onClick={onOpenFolder} disabled={openingFolder}>打开文件夹 ↗</button>
       </div>
       <details className="directory-info"><summary>目录信息</summary><code>{directory}</code>
