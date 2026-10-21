@@ -63,7 +63,13 @@ stop() {
     echo "• 未运行"
   fi
   rm -f "$PID_FILE"
-  listening && echo "• 端口 $PORT 仍被占用（可能是外部启动的进程）"
+  if listening; then
+    echo "✗ 端口 $PORT 仍被占用（可能是外部启动的进程）"
+    return 1
+  fi
+
+  echo "■ 服务已停止"
+  return 0
 }
 
 case "${1:-}" in
